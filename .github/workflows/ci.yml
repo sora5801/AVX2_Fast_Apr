@@ -1,0 +1,39 @@
+# Build the library and run the accuracy test on Linux with both GCC and Clang.
+#
+# GitHub-hosted x86-64 runners support AVX2+FMA, so the AVX2 binaries run
+# natively. As an extra safety net the test/bench binaries call
+# avx2_math_cpu_supported() at startup and exit 0 (green skip) on the rare
+# runner that lacks AVX2, instead of faulting.
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [ gcc, clang ]
+    name: build & test (${{ matrix.cc }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show CPU features
+        run: grep -o 'avx2\|fma' /proc/cpuinfo | sort -u || true
+
+      - name: Build (warnings as errors)
+        run: make CC=${{ matrix.cc }} CFLAGS="-std=c11 -Wall -Wextra -Werror -O3 -mavx2 -mfma -Iinclude"
+
+      - name: Accuracy test
+        run: ./build/test_accuracy
+
+      - name: Benchmark (smoke)
+        run: ./build/bench
+
+      - name: Demo
+        run: ./build/demo

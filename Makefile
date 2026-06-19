@@ -19,6 +19,7 @@ LDLIBS  ?= -lm
 
 BUILD   := build
 SRC     := src/avx2_math.c
+HEADERS := include/avx2_math.h include/avx2_math_f32.h include/avx2_math_f64.h
 
 # Windows executables need the .exe suffix to run cleanly under MSYS/cmd.
 ifeq ($(OS),Windows_NT)
@@ -37,13 +38,13 @@ all: $(TEST) $(BENCH) $(DEMO)
 $(BUILD):
 	mkdir -p $(BUILD)
 
-$(TEST): test/test_accuracy.c $(SRC) include/avx2_math.h | $(BUILD)
+$(TEST): test/test_accuracy.c $(SRC) $(HEADERS) | $(BUILD)
 	$(CC) $(CFLAGS) $< $(SRC) -o $@ $(LDLIBS)
 
-$(BENCH): bench/bench.c $(SRC) include/avx2_math.h | $(BUILD)
+$(BENCH): bench/bench.c $(SRC) $(HEADERS) | $(BUILD)
 	$(CC) $(CFLAGS) $< $(SRC) -o $@ $(LDLIBS)
 
-$(DEMO): examples/demo.c $(SRC) include/avx2_math.h | $(BUILD)
+$(DEMO): examples/demo.c $(SRC) $(HEADERS) | $(BUILD)
 	$(CC) $(CFLAGS) $< $(SRC) -o $@ $(LDLIBS)
 
 test: $(TEST)

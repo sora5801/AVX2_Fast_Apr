@@ -1,5 +1,6 @@
 # build output
 build/
+scratch/
 *.o
 *.obj
 *.exe

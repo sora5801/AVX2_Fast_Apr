@@ -21,7 +21,7 @@ jobs:
         cc: [ gcc, clang ]
     name: build & test (${{ matrix.cc }})
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Show CPU features
         run: grep -o 'avx2\|fma' /proc/cpuinfo | sort -u || true

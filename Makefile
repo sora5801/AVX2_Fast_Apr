@@ -5,6 +5,7 @@
 #   make test       build and run the accuracy test
 #   make bench      build and run the throughput benchmark
 #   make demo       build and run the usage demo
+#   make asm        (re)generate the study/ assembly + machine-code artifacts
 #   make clean      remove build artifacts
 #
 # On Windows with MSYS2/mingw, invoke with `mingw32-make`.
@@ -32,7 +33,10 @@ TEST  := $(BUILD)/test_accuracy$(EXE)
 BENCH := $(BUILD)/bench$(EXE)
 DEMO  := $(BUILD)/demo$(EXE)
 
-.PHONY: all test bench demo clean
+OBJDUMP ?= objdump
+STUDY   := study
+
+.PHONY: all test bench demo asm clean
 all: $(TEST) $(BENCH) $(DEMO)
 
 $(BUILD):
@@ -55,6 +59,15 @@ bench: $(BENCH)
 
 demo: $(DEMO)
 	./$(DEMO)
+
+# Regenerate the study/ artifacts: assembly (Intel + AT&T), the object file,
+# the disassembly-with-bytes, and a .text hex dump. See study/README.md.
+asm: $(STUDY)/kernels.c $(HEADERS)
+	$(CC) $(CSTD) $(OPT) $(ARCH) -Iinclude -S -masm=intel -fverbose-asm $(STUDY)/kernels.c -o $(STUDY)/avx2_math.intel.s
+	$(CC) $(CSTD) $(OPT) $(ARCH) -Iinclude -S -fverbose-asm            $(STUDY)/kernels.c -o $(STUDY)/avx2_math.att.s
+	$(CC) $(CSTD) $(OPT) $(ARCH) -Iinclude -c                          $(STUDY)/kernels.c -o $(STUDY)/avx2_math.o
+	$(OBJDUMP) -d -M intel $(STUDY)/avx2_math.o > $(STUDY)/avx2_math.disasm.txt
+	$(OBJDUMP) -s -j .text $(STUDY)/avx2_math.o > $(STUDY)/avx2_math.text.hex
 
 clean:
 	rm -rf $(BUILD)

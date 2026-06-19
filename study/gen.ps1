@@ -10,8 +10,11 @@
     avx2_math.o          - the assembled object file (native COFF on Windows)
     avx2_math.disasm.txt - objdump disassembly WITH machine-code bytes per insn
     avx2_math.text.hex   - raw hex dump of the .text section (the machine code)
+    avx2_math.ll         - LLVM IR (clang only): the typed SSA "intermediate
+                           representation" - the nearest analogue to "byte code"
+                           for ahead-of-time-compiled C.
 
-  These let you line up: C intrinsic  ->  assembly mnemonic  ->  machine bytes.
+  These let you line up: C intrinsic  ->  LLVM IR  ->  assembly mnemonic  ->  machine bytes.
 
 .PARAMETER CC
   Compiler (default gcc). clang also works.
@@ -46,5 +49,15 @@ Write-Host "[objdump] disassembly+bytes -> avx2_math.disasm.txt" -ForegroundColo
 Write-Host "[objdump] .text hex dump    -> avx2_math.text.hex" -ForegroundColor Cyan
 & $objdump -s -j .text (Join-Path $study 'avx2_math.o') |
     Out-File -Encoding ascii (Join-Path $study 'avx2_math.text.hex')
+
+# LLVM IR is a clang feature; emit it whenever clang is available (even if the
+# main compiler chosen above is gcc), since it is valuable study material.
+$clang = (Get-Command clang -ErrorAction SilentlyContinue).Source
+if ($clang) {
+    Write-Host "[clang] LLVM IR             -> avx2_math.ll" -ForegroundColor Cyan
+    & $clang @cf -S -emit-llvm $src -o (Join-Path $study 'avx2_math.ll')
+} else {
+    Write-Host "(clang not found; skipping avx2_math.ll)" -ForegroundColor DarkYellow
+}
 
 Write-Host "done." -ForegroundColor Green

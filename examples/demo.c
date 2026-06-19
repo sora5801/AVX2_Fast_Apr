@@ -69,6 +69,16 @@ int main(void)
     show_f32("softplus", avx2_softplus_ps(x));
     show_f32("gelu",     avx2_gelu_ps(x));
 
+    /* trigonometry: sincos computes both at once */
+    const float ang[8] = { 0.0f, 0.5236f, 0.7854f, 1.0472f, 1.5708f, 2.0944f, 3.1416f, 4.7124f };
+    __m256 a = _mm256_loadu_ps(ang);
+    __m256 sv, cv;
+    avx2_sincos_ps(a, &sv, &cv);
+    printf("\n");
+    show_f32("angle",    a);
+    show_f32("sin",      sv);
+    show_f32("cos",      cv);
+
     /* round-trip sanity: log(exp(x)) should recover x */
     printf("\n");
     show_f32("log(exp)", avx2_log_ps(avx2_exp_ps(x)));

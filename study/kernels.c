@@ -37,6 +37,10 @@ KW __m256 avx2k_sqrt_ps  (__m256 x) { return avx2_sqrt_ps(x); }
 KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
 KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
 KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
+KW __m256 avx2k_sin_ps   (__m256 x) { return avx2_sin_ps(x); }
+KW __m256 avx2k_cos_ps   (__m256 x) { return avx2_cos_ps(x); }
+/* the full dual-output sincos (writes both results to memory) */
+KW void   avx2k_sincos_ps(__m256 x, __m256 *s, __m256 *c) { avx2_sincos_ps(x, s, c); }
 KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 
 /* ---- double precision (return one __m256d = 4 doubles) ---- */

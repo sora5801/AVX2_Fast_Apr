@@ -19,6 +19,12 @@
  *    tanh   tanh x       - polynomial near 0, exp identity for large |x|.
  *    sigmoid 1/(1+e^-x)  - overflow-safe logistic.
  *    pow    x^y          - 2^(y*log2 x), fast variant.
+ *    rsqrt  1/sqrt(x)     - hardware seed + Newton-Raphson.
+ *    sqrt   sqrt(x)       - hardware vsqrtps.
+ *    cbrt   x^(1/3)       - exponent bit-trick seed + Halley.
+ *    softplus ln(1+e^x)   - overflow-safe smooth ReLU.
+ *    gelu   x*Phi(x)      - GPT/BERT tanh approximation.
+ *    sin/cos/sincos       - Cephes quadrant reduction + dual polynomial.
  *
  *  SPDX-License-Identifier: MIT
  */
@@ -840,6 +846,138 @@ static inline __m256 avx2_gelu_ps(__m256 x)
     const __m256 t = avx2_tanh_ps(inner);
     /* 0.5*x*(1 + tanh(inner)) */
     return _mm256_mul_ps(_mm256_mul_ps(half, x), _mm256_add_ps(one, t));
+}
+
+/* ===========================================================================
+ *  sin / cos / sincos     (Cephes quadrant reduction)
+ * ===========================================================================
+ *
+ *  THE BIG IDEA. sin and cos are periodic with period 2*pi, and within one
+ *  period they are just shifted/sign-flipped copies of a SINGLE small-angle
+ *  polynomial. So:
+ *
+ *    1. Reduce |x| into a small interval [-pi/4, pi/4] by subtracting an
+ *       integer multiple of pi/4. That integer (call it j) is the "octant".
+ *    2. Pick which polynomial to use, and what sign, FROM THE OCTANT BITS:
+ *         - bit 1 of j chooses between the sin-polynomial (odd, ~x - x^3/6...)
+ *           and the cos-polynomial (even, ~1 - x^2/2...);
+ *         - bit 2 of j flips the sign.
+ *       Computing the result for BOTH sin and cos at once is nearly free,
+ *       because they share the reduced angle and the two polynomials - hence
+ *       sincos returns both.
+ *
+ *  WHY pi/4 IN THREE PIECES. The reduction subtracts j*(pi/4) from x. If j is
+ *  large (x far from 0) and pi/4 were a single float, j*(pi/4) would be rounded
+ *  and the subtraction would cancel away most of x's significant bits. Splitting
+ *  pi/4 into DP1 + DP2 + DP3 (high/medium/low parts) and subtracting them one at
+ *  a time with FMA keeps far more precision. (This is the same two/three-part
+ *  constant trick used for ln2 in exp and log.)
+ *
+ *  ACCURACY: <= ~2 ULP for |x| up to a few thousand. Beyond that the 3-part
+ *  reduction runs out of bits and error grows; |x| >= 2^23 or +-inf/NaN are out
+ *  of range (no payne-hanek reduction here). Reduce huge arguments yourself if
+ *  you need them.
+ */
+static inline void avx2_sincos_ps(__m256 x, __m256 *s_out, __m256 *c_out)
+{
+    const __m256 sign_mask     = _mm256_castsi256_ps(_mm256_set1_epi32((int)0x80000000));
+    const __m256 inv_sign_mask = _mm256_castsi256_ps(_mm256_set1_epi32(0x7fffffff));
+    const __m256 FOPI = _mm256_set1_ps(1.27323954473516f);   /* 4/pi: x*4/pi = octant count */
+    /* pi/4 split into three parts for the extended-precision reduction. */
+    const __m256 MDP1 = _mm256_set1_ps(-0.78515625f);
+    const __m256 MDP2 = _mm256_set1_ps(-2.4187564849853515625e-4f);
+    const __m256 MDP3 = _mm256_set1_ps(-3.77489497744594108e-8f);
+    /* sin polynomial coefficients (odd function of x, in z = x^2). */
+    const __m256 sin_p0 = _mm256_set1_ps(-1.9515295891E-4f);
+    const __m256 sin_p1 = _mm256_set1_ps( 8.3321608736E-3f);
+    const __m256 sin_p2 = _mm256_set1_ps(-1.6666654611E-1f);
+    /* cos polynomial coefficients (even function of x, in z = x^2). */
+    const __m256 cos_p0 = _mm256_set1_ps( 2.443315711809948E-5f);
+    const __m256 cos_p1 = _mm256_set1_ps(-1.388731625493765E-3f);
+    const __m256 cos_p2 = _mm256_set1_ps( 4.166664568298827E-2f);
+    const __m256 half = _mm256_set1_ps(0.5f);
+    const __m256 one  = _mm256_set1_ps(1.0f);
+
+    /* sine is ODD: remember the sign bit of x, then work on |x|. */
+    __m256 sign_bit_sin = _mm256_and_ps(x, sign_mask);
+    x = _mm256_and_ps(x, inv_sign_mask);                 /* x = |x| */
+
+    /* j = octant index = round(|x| * 4/pi), forced up to the next even integer. */
+    __m256 y = _mm256_mul_ps(x, FOPI);
+    __m256i j = _mm256_cvttps_epi32(y);                  /* truncate toward 0 */
+    j = _mm256_add_epi32(j, _mm256_set1_epi32(1));        /* j + 1            */
+    j = _mm256_and_si256(j, _mm256_set1_epi32(~1));       /* & ~1 -> even     */
+    y = _mm256_cvtepi32_ps(j);                           /* y = (float)j     */
+
+    /* SINE sign swap comes from bit 2 (the "4") of j: shift it up to the sign
+     * bit position (bit 31) so it can be XORed into the result later. */
+    __m256i swap_sin = _mm256_slli_epi32(_mm256_and_si256(j, _mm256_set1_epi32(4)), 29);
+    const __m256 swap_sign_bit_sin = _mm256_castsi256_ps(swap_sin);
+
+    /* POLYNOMIAL SELECT mask comes from bit 1 (the "2") of j: all-ones where
+     * bit1 == 0. Where true we use the sin-poly for sine, cos-poly for cosine;
+     * where false they swap. */
+    __m256i sel = _mm256_and_si256(j, _mm256_set1_epi32(2));
+    sel = _mm256_cmpeq_epi32(sel, _mm256_setzero_si256());
+    const __m256 poly_mask = _mm256_castsi256_ps(sel);
+
+    /* Extended-precision reduction: x <- x - j*(pi/4), three FMA steps. */
+    x = _mm256_fmadd_ps(y, MDP1, x);
+    x = _mm256_fmadd_ps(y, MDP2, x);
+    x = _mm256_fmadd_ps(y, MDP3, x);                     /* now x in [-pi/4, pi/4] */
+
+    /* COSINE sign comes from ((j-2) & 4), again shifted to the sign bit. */
+    __m256i csign = _mm256_sub_epi32(j, _mm256_set1_epi32(2));
+    csign = _mm256_andnot_si256(csign, _mm256_set1_epi32(4));
+    csign = _mm256_slli_epi32(csign, 29);
+    const __m256 sign_bit_cos = _mm256_castsi256_ps(csign);
+
+    /* Fold the octant sin-sign into x's original sign. */
+    sign_bit_sin = _mm256_xor_ps(sign_bit_sin, swap_sign_bit_sin);
+
+    const __m256 z = _mm256_mul_ps(x, x);                /* z = x^2 */
+
+    /* COS polynomial:  yc = 1 - z/2 + z^2 * Pcos(z). */
+    __m256 yc = cos_p0;
+    yc = _mm256_fmadd_ps(yc, z, cos_p1);
+    yc = _mm256_fmadd_ps(yc, z, cos_p2);
+    yc = _mm256_mul_ps(yc, z);
+    yc = _mm256_mul_ps(yc, z);                           /* z^2 * Pcos(z)   */
+    yc = _mm256_fnmadd_ps(z, half, yc);                  /* - z/2           */
+    yc = _mm256_add_ps(yc, one);                         /* + 1             */
+
+    /* SIN polynomial:  ys = x + x^3 * Psin(z) = x + x*z*Psin(z). */
+    __m256 ys = sin_p0;
+    ys = _mm256_fmadd_ps(ys, z, sin_p1);
+    ys = _mm256_fmadd_ps(ys, z, sin_p2);
+    ys = _mm256_mul_ps(ys, z);                           /* z * Psin(z)     */
+    ys = _mm256_fmadd_ps(ys, x, x);                      /* x*z*Psin + x    */
+
+    /* Select per octant: where poly_mask is true, sine uses ys and cosine uses
+     * yc; where false they swap. blendv(a,b,m) = m ? b : a. */
+    __m256 sin = _mm256_blendv_ps(yc, ys, poly_mask);
+    __m256 cos = _mm256_blendv_ps(ys, yc, poly_mask);
+
+    /* Apply the signs (XOR the sign bit into the result). */
+    *s_out = _mm256_xor_ps(sin, sign_bit_sin);
+    *c_out = _mm256_xor_ps(cos, sign_bit_cos);
+}
+
+/* sin(x): compute both, return the sine. (With -O3 the cosine-only work is
+ * largely eliminated by the optimizer.) */
+static inline __m256 avx2_sin_ps(__m256 x)
+{
+    __m256 s, c;
+    avx2_sincos_ps(x, &s, &c);
+    return s;
+}
+
+/* cos(x): compute both, return the cosine. */
+static inline __m256 avx2_cos_ps(__m256 x)
+{
+    __m256 s, c;
+    avx2_sincos_ps(x, &s, &c);
+    return c;
 }
 
 #endif /* AVX2_MATH_F32_H */

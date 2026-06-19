@@ -125,6 +125,32 @@ static void check_d(const char *name, vfn_d vf, rfn_d rf,
         printf("      worst @ %.17g: got %.17g ref %.17g\n", worst_in, worst_got, worst_ref);
 }
 
+/* For bounded functions (sin, cos, gelu) ULP is meaningless near a zero
+ * crossing, so we check max ABSOLUTE error instead. */
+static void check_abs(const char *name, vfn_f vf, rfn_f rf,
+                      double lo, double hi, size_t samples, double budget)
+{
+    double max_abs = 0.0, worst = 0;
+    const double step = (hi - lo) / (double)(samples - 1);
+    float in[8], out[8];
+    for (size_t base = 0; base < samples; base += 8) {
+        for (int k = 0; k < 8; ++k) {
+            size_t idx = base + (size_t)k; if (idx >= samples) idx = samples - 1;
+            in[k] = (float)(lo + step * (double)idx);
+        }
+        _mm256_storeu_ps(out, vf(_mm256_loadu_ps(in)));
+        for (int k = 0; k < 8 && base + (size_t)k < samples; ++k) {
+            double a = fabs((double)out[k] - rf((double)in[k]));
+            if (a > max_abs) { max_abs = a; worst = in[k]; }
+        }
+    }
+    int pass = max_abs <= budget;
+    if (!pass) g_failures++;
+    printf("  %-9s [% .3g, % .3g]  max_abs=%.2e (<=%.1e) %s\n",
+           name, lo, hi, max_abs, budget, pass ? "PASS" : "FAIL");
+    if (!pass) printf("      worst @ %.9g\n", worst);
+}
+
 /* ====================== references libm lacks directly ====================== */
 static double ref_exp10(double x)    { return pow(10.0, x); }
 static double ref_sigmoid(double x)  { return 1.0 / (1.0 + exp(-x)); }
@@ -235,6 +261,9 @@ int main(void)
     check_f("sqrt",  avx2_sqrt_ps,   sqrt,         0.0,   1e6,   2000003, 1);
     check_f("cbrt",  avx2_cbrt_ps,   cbrt,        -1e6,   1e6,   2000003, 4);
     check_f("softplus",avx2_softplus_ps,ref_softplus,-30.0,30.0, 2000003, 4);
+    /* sin/cos are bounded -> abs-error metric (ULP explodes at zero crossings). */
+    check_abs("sin", avx2_sin_ps,    sin,         -100.0, 100.0, 2000003, 3e-7);
+    check_abs("cos", avx2_cos_ps,    cos,         -100.0, 100.0, 2000003, 3e-7);
     check_gelu();
     check_pow();
 
@@ -278,6 +307,11 @@ int main(void)
     expect("f32 gelu(0)",    one_f(avx2_gelu_ps, 0.0f),           0.0);
     expect("f32 gelu(10)",   one_f(avx2_gelu_ps, 10.0f),          10.0);   /* saturates to x */
     expect("f32 gelu(-10)",  one_f(avx2_gelu_ps, -10.0f),         0.0);    /* saturates to 0 */
+    expect("f32 sin(0)",     one_f(avx2_sin_ps, 0.0f),            0.0);
+    expect("f32 cos(0)",     one_f(avx2_cos_ps, 0.0f),            1.0);
+    expect("f32 sin(pi/2)",  one_f(avx2_sin_ps, 1.5707963268f),   1.0);
+    expect("f32 cos(pi)",    one_f(avx2_cos_ps, 3.1415926536f),   -1.0);
+    expect("f32 sin(-pi/2)", one_f(avx2_sin_ps, -1.5707963268f),  -1.0);
 
     {   /* pow specials */
         float o[8], b[8], e[8];

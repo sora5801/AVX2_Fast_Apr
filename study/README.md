@@ -1,7 +1,24 @@
-# study/ — assembly & machine-code artifacts
+# study/ — learning materials
 
-Generated material for studying how the AVX2+FMA kernels compile down to the
-metal. Regenerate any time with:
+A self-contained course on how the AVX2+FMA kernels work, from the
+floating-point theory down to the machine-code bytes.
+
+## Start here
+
+- **[notes/00-START-HERE.md](notes/00-START-HERE.md)** — the guided course
+  (7 chapters: SIMD & AVX2, range reduction, IEEE-754 bit tricks, iterative
+  refinement, accuracy/ULP, an instruction glossary, and reading machine
+  code + IR).
+- **[WALKTHROUGH.md](WALKTHROUGH.md)** — line-by-line tour of `exp_ps`
+  (C → assembly → machine-code bytes).
+- **[annotated/](annotated/)** — hand-annotated disassembly with per-instruction
+  commentary:
+  [`rsqrt_ps`](annotated/rsqrt_ps.annotated.s) (Newton-Raphson) and
+  [`cbrt_ps`](annotated/cbrt_ps.annotated.s) (the integer `/3` bit-trick + Halley).
+
+## Generated artifacts
+
+Regenerate any time with:
 
 ```sh
 make asm                 # POSIX / MSYS (uses gcc + objdump)
@@ -25,7 +42,7 @@ across the call sites that would normally inline it.
 | `avx2_math.o` | the **assembled object file** (native format: COFF on Windows, ELF on Linux) | binary; feed to objdump / a disassembler |
 | `avx2_math.disasm.txt` | **disassembly with machine-code bytes** — each instruction shown next to the exact bytes it assembled to | the bridge between mnemonics and raw bytes |
 | `avx2_math.text.hex` | **raw hex dump of the `.text` section** — the machine code as a flat byte stream | `offset: bytes  ascii`, à la `objdump -s` |
-| [`WALKTHROUGH.md`](WALKTHROUGH.md) | **hand-annotated tour of `exp_ps`**, C → assembly → bytes, line by line | start here |
+| `avx2_math.ll` | **LLVM IR** (clang only) — the typed SSA intermediate, the nearest analogue to "byte code" for AOT-compiled C | see notes/07 |
 
 ## "Assembly vs machine code vs byte code"
 
@@ -38,10 +55,9 @@ A quick note on the terms, since the request mentioned all three:
 - **Byte code** in the Java/Python/WASM sense does **not** exist here: C is
   compiled ahead-of-time straight to native machine code for this specific CPU
   (x86-64 + AVX2 + FMA). There is no intermediate VM bytecode. The nearest
-  analogue — the portable intermediate the compiler uses internally — is GCC's
-  GIMPLE/RTL or LLVM IR; you can dump LLVM IR with
-  `clang -O3 -mavx2 -mfma -S -emit-llvm -Iinclude study/kernels.c -o kernels.ll`
-  if you want to see that layer too.
+  analogue — the portable intermediate the compiler uses internally — is LLVM IR,
+  which `make asm` / `gen.ps1` emit to `avx2_math.ll` (when clang is available).
+  [notes/07](notes/07-reading-machine-code-and-ir.md) reads it in detail.
 
 ## Reading tips
 

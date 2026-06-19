@@ -68,6 +68,10 @@ asm: $(STUDY)/kernels.c $(HEADERS)
 	$(CC) $(CSTD) $(OPT) $(ARCH) -Iinclude -c                          $(STUDY)/kernels.c -o $(STUDY)/avx2_math.o
 	$(OBJDUMP) -d -M intel $(STUDY)/avx2_math.o > $(STUDY)/avx2_math.disasm.txt
 	$(OBJDUMP) -s -j .text $(STUDY)/avx2_math.o > $(STUDY)/avx2_math.text.hex
+	@command -v clang >/dev/null 2>&1 && { \
+	  echo "clang -S -emit-llvm -> $(STUDY)/avx2_math.ll"; \
+	  clang $(CSTD) $(OPT) $(ARCH) -Iinclude -S -emit-llvm $(STUDY)/kernels.c -o $(STUDY)/avx2_math.ll; \
+	} || echo "(clang not found; skipping avx2_math.ll)"
 
 clean:
 	rm -rf $(BUILD)

@@ -44,6 +44,31 @@ AVX2M_DEFINE_F32_UNARY(avx2_sqrt_f32,   avx2_sqrt_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_cbrt_f32,   avx2_cbrt_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_softplus_f32,avx2_softplus_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_gelu_f32,   avx2_gelu_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_sin_f32,    avx2_sin_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_cos_f32,    avx2_cos_ps)
+
+/* sincos: two outputs per input. Same tail-padding scheme as the unary macro. */
+void avx2_sincos_f32(const float *in, float *sout, float *cout, size_t n)
+{
+    size_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        __m256 s, c;
+        avx2_sincos_ps(_mm256_loadu_ps(in + i), &s, &c);
+        _mm256_storeu_ps(sout + i, s);
+        _mm256_storeu_ps(cout + i, c);
+    }
+    if (i < n) {
+        float ib[8], sb[8], cb[8];
+        size_t rem = n - i, k;
+        for (k = 0; k < rem; ++k) ib[k] = in[i + k];
+        for (; k < 8; ++k)        ib[k] = 0.0f;
+        __m256 s, c;
+        avx2_sincos_ps(_mm256_loadu_ps(ib), &s, &c);
+        _mm256_storeu_ps(sb, s);
+        _mm256_storeu_ps(cb, c);
+        for (k = 0; k < rem; ++k) { sout[i + k] = sb[k]; cout[i + k] = cb[k]; }
+    }
+}
 
 /* ---- single precision, two inputs: out[i] = pow(base[i], exp_[i]) ------- */
 void avx2_pow_f32(const float *base, const float *exp_, float *out, size_t n)

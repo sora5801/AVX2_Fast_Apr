@@ -24,6 +24,7 @@ avx2_log_f32(in, out, n);         // bulk array helper, any length
 | **log family** | `log` `log2` `log10` `log1p` | `log` |
 | **power / roots** | `pow` `sqrt` `rsqrt` `cbrt` | |
 | **activations**| `tanh` `sigmoid` `softplus` `gelu` | |
+| **trigonometry**| `sin` `cos` `sincos` | |
 
 Each has a per-vector kernel (`avx2_exp_ps`, `avx2_exp_pd`, …) and a bulk array
 helper (`avx2_exp_f32`, `avx2_exp_f64`, …) that handles any length including a
@@ -44,6 +45,7 @@ the authoritative check; numbers below are its output):
 | `exp` (f64)   | **2** | | `log` (f64)   | **2** |
 | `rsqrt` (f32) | **2** | | `sqrt` (f32)  | **0** |
 | `cbrt` (f32)  | **3** | | `softplus`(f32)| **3** |
+| `sin`/`cos` (f32) | abs err ≤ 1e-7 for \|x\| ≲ few·10³ | | | |
 | `pow` (f32)   | ~ few ULP for moderate exponents (fast variant — see below) | | | |
 | `gelu` (f32)  | abs err ≤ 5e-4 vs exact erf-GELU (it *is* the tanh approximation, see below) | | | |
 
@@ -113,14 +115,20 @@ See the heavily-commented headers for the full derivations:
 
 ## Studying the generated code
 
-The [`study/`](study/) directory contains the kernels lowered to the metal, so
-you can line up *C intrinsic → assembly → machine-code bytes*:
+The [`study/`](study/) directory is a self-contained course on how these kernels
+work, from the floating-point theory down to the machine-code bytes:
 
-- [`study/WALKTHROUGH.md`](study/WALKTHROUGH.md) — a hand-annotated,
-  instruction-by-instruction tour of `avx2_exp_ps` (start here).
-- `avx2_math.intel.s` / `avx2_math.att.s` — full assembly, both syntaxes.
-- `avx2_math.disasm.txt` — disassembly with the machine-code bytes per instruction.
+- **[`study/notes/`](study/notes/00-START-HERE.md)** — a 7-chapter guided course
+  (SIMD & AVX2, range reduction, IEEE-754 bit tricks, Newton/Halley refinement,
+  accuracy & ULP, an instruction glossary, and reading machine code + IR).
+- [`study/WALKTHROUGH.md`](study/WALKTHROUGH.md) — line-by-line tour of `exp_ps`.
+- [`study/annotated/`](study/annotated/) — hand-annotated disassembly of
+  `rsqrt_ps` (Newton-Raphson) and `cbrt_ps` (the integer `/3` bit-trick + Halley).
+- `avx2_math.intel.s` / `.att.s` — full assembly, both syntaxes.
+- `avx2_math.disasm.txt` — disassembly with machine-code bytes per instruction.
 - `avx2_math.text.hex` — raw `.text` hex dump.
+- `avx2_math.ll` — LLVM IR (the typed SSA intermediate; the nearest thing to
+  "byte code" for AOT-compiled C).
 
 Regenerate for your platform/compiler with `make asm` or `study/gen.ps1`.
 

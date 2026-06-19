@@ -32,6 +32,11 @@ KW __m256 avx2k_log10_ps (__m256 x) { return avx2_log10_ps(x); }
 KW __m256 avx2k_log1p_ps (__m256 x) { return avx2_log1p_ps(x); }
 KW __m256 avx2k_tanh_ps  (__m256 x) { return avx2_tanh_ps(x); }
 KW __m256 avx2k_sigmoid_ps(__m256 x){ return avx2_sigmoid_ps(x); }
+KW __m256 avx2k_rsqrt_ps (__m256 x) { return avx2_rsqrt_ps(x); }
+KW __m256 avx2k_sqrt_ps  (__m256 x) { return avx2_sqrt_ps(x); }
+KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
+KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
+KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
 KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 
 /* ---- double precision (return one __m256d = 4 doubles) ---- */

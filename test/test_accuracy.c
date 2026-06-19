@@ -126,8 +126,39 @@ static void check_d(const char *name, vfn_d vf, rfn_d rf,
 }
 
 /* ====================== references libm lacks directly ====================== */
-static double ref_exp10(double x)   { return pow(10.0, x); }
-static double ref_sigmoid(double x) { return 1.0 / (1.0 + exp(-x)); }
+static double ref_exp10(double x)    { return pow(10.0, x); }
+static double ref_sigmoid(double x)  { return 1.0 / (1.0 + exp(-x)); }
+static double ref_rsqrt(double x)    { return 1.0 / sqrt(x); }
+static double ref_softplus(double x) { return log1p(exp(x)); }
+/* exact GELU (erf form) - avx2_gelu_ps is the tanh APPROXIMATION of this. */
+static double ref_gelu_exact(double x) { return 0.5 * x * (1.0 + erf(x / sqrt(2.0))); }
+
+/* GELU is checked by max ABSOLUTE error vs the exact erf form, because the
+ * tanh approximation legitimately differs by ~5e-4 (not a bug), and because
+ * ULP near gelu's zero-crossing is meaningless. */
+static void check_gelu(void)
+{
+    double max_abs = 0.0, worst = 0;
+    float in[8], out[8];
+    const double lo = -10.0, hi = 10.0; const size_t samples = 2000003;
+    const double step = (hi - lo) / (double)(samples - 1);
+    for (size_t base = 0; base < samples; base += 8) {
+        for (int k = 0; k < 8; ++k) {
+            size_t idx = base + (size_t)k; if (idx >= samples) idx = samples - 1;
+            in[k] = (float)(lo + step * (double)idx);
+        }
+        _mm256_storeu_ps(out, avx2_gelu_ps(_mm256_loadu_ps(in)));
+        for (int k = 0; k < 8 && base + (size_t)k < samples; ++k) {
+            double a = fabs((double)out[k] - ref_gelu_exact((double)in[k]));
+            if (a > max_abs) { max_abs = a; worst = in[k]; }
+        }
+    }
+    int pass = max_abs <= 1.5e-3;   /* tanh-approx error budget */
+    if (!pass) g_failures++;
+    printf("  %-9s [-10, 10]  max_abs_vs_exact=%.2e (<=1.5e-3, tanh approx) %s\n",
+           "gelu", max_abs, pass ? "PASS" : "FAIL");
+    if (!pass) printf("      worst @ %.6g\n", worst);
+}
 
 /* ====================== pow grid ====================== */
 static void check_pow(void)
@@ -200,6 +231,11 @@ int main(void)
     check_f("log1p", avx2_log1p_ps,  log1p,       -1e-3,  1e-3,   500003, 3);
     check_f("tanh",  avx2_tanh_ps,   tanh,        -20.0,  20.0,  2000003, 3);
     check_f("sigmoid",avx2_sigmoid_ps,ref_sigmoid,-30.0,  30.0,  2000003, 3);
+    check_f("rsqrt", avx2_rsqrt_ps,  ref_rsqrt,    1e-6,  1e6,   2000003, 3);
+    check_f("sqrt",  avx2_sqrt_ps,   sqrt,         0.0,   1e6,   2000003, 1);
+    check_f("cbrt",  avx2_cbrt_ps,   cbrt,        -1e6,   1e6,   2000003, 4);
+    check_f("softplus",avx2_softplus_ps,ref_softplus,-30.0,30.0, 2000003, 4);
+    check_gelu();
     check_pow();
 
     printf("\n=== f64 sweeps ===\n");
@@ -228,6 +264,20 @@ int main(void)
     expect("f32 sigmoid(0)", one_f(avx2_sigmoid_ps, 0.0f),        0.5);
     expect("f32 sigmoid(+inf)",one_f(avx2_sigmoid_ps, INFINITY),  1.0);
     expect("f32 sigmoid(-inf)",one_f(avx2_sigmoid_ps, -INFINITY), 0.0);
+    expect("f32 rsqrt(4)",   one_f(avx2_rsqrt_ps, 4.0f),          0.5);
+    expect("f32 rsqrt(0)",   one_f(avx2_rsqrt_ps, 0.0f),          INFINITY);
+    expect("f32 rsqrt(-1)",  one_f(avx2_rsqrt_ps, -1.0f),         NAN);
+    expect("f32 sqrt(16)",   one_f(avx2_sqrt_ps, 16.0f),          4.0);
+    expect("f32 sqrt(-1)",   one_f(avx2_sqrt_ps, -1.0f),          NAN);
+    expect("f32 cbrt(27)",   one_f(avx2_cbrt_ps, 27.0f),          3.0);
+    expect("f32 cbrt(-27)",  one_f(avx2_cbrt_ps, -27.0f),         -3.0);
+    expect("f32 cbrt(0)",    one_f(avx2_cbrt_ps, 0.0f),           0.0);
+    expect("f32 cbrt(+inf)", one_f(avx2_cbrt_ps, INFINITY),       INFINITY);
+    expect("f32 softplus(0)",one_f(avx2_softplus_ps, 0.0f),       0.6931472);
+    expect("f32 softplus(-inf)",one_f(avx2_softplus_ps, -INFINITY),0.0);
+    expect("f32 gelu(0)",    one_f(avx2_gelu_ps, 0.0f),           0.0);
+    expect("f32 gelu(10)",   one_f(avx2_gelu_ps, 10.0f),          10.0);   /* saturates to x */
+    expect("f32 gelu(-10)",  one_f(avx2_gelu_ps, -10.0f),         0.0);    /* saturates to 0 */
 
     {   /* pow specials */
         float o[8], b[8], e[8];

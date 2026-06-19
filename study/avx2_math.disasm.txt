@@ -614,7 +614,7 @@ Disassembly of section .text:
      a5f:	c5 f8 57 c0          	vxorps xmm0,xmm0,xmm0
      a63:	c4 e2 7d 18 2d 5c 00 	vbroadcastss ymm5,DWORD PTR [rip+0x5c]        # ac8 <avx2k_tanh_ps+0x78>
      a6a:	00 00 
-     a6c:	c4 e2 7d 18 35 24 01 	vbroadcastss ymm6,DWORD PTR [rip+0x124]        # b99 <avx2k_tanh_ps+0x149>
+     a6c:	c4 e2 7d 18 35 2c 01 	vbroadcastss ymm6,DWORD PTR [rip+0x12c]        # ba1 <avx2k_tanh_ps+0x151>
      a73:	00 00 
      a75:	c4 e2 7d 18 0d 00 00 	vbroadcastss ymm1,DWORD PTR [rip+0x0]        # a7e <avx2k_tanh_ps+0x2e>
      a7c:	00 00 
@@ -763,356 +763,721 @@ Disassembly of section .text:
      ce5:	66 66 2e 0f 1f 84 00 	data16 cs nop WORD PTR [rax+rax*1+0x0]
      cec:	00 00 00 00 
 
-0000000000000cf0 <avx2k_pow_ps>:
-     cf0:	48 83 ec 68          	sub    rsp,0x68
+0000000000000cf0 <avx2k_rsqrt_ps>:
+     cf0:	48 83 ec 18          	sub    rsp,0x18
      cf4:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
-     cf9:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
-     cff:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
-     d05:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
-     d0b:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
-     d11:	c5 78 11 5c 24 50    	vmovups XMMWORD PTR [rsp+0x50],xmm11
-     d17:	c5 d0 57 ed          	vxorps xmm5,xmm5,xmm5
-     d1b:	c4 e2 7d 18 05 6c 00 	vbroadcastss ymm0,DWORD PTR [rip+0x6c]        # d90 <avx2k_pow_ps+0xa0>
-     d22:	00 00 
-     d24:	c4 e2 7d 18 0d 70 00 	vbroadcastss ymm1,DWORD PTR [rip+0x70]        # d9d <avx2k_pow_ps+0xad>
-     d2b:	00 00 
-     d2d:	c4 e2 7d 18 35 28 00 	vbroadcastss ymm6,DWORD PTR [rip+0x28]        # d5e <avx2k_pow_ps+0x6e>
-     d34:	00 00 
-     d36:	c4 62 7d 18 0d 74 00 	vbroadcastss ymm9,DWORD PTR [rip+0x74]        # db3 <avx2k_pow_ps+0xc3>
-     d3d:	00 00 
-     d3f:	c5 fc 10 12          	vmovups ymm2,YMMWORD PTR [rdx]
-     d43:	ba 81 ff ff ff       	mov    edx,0xffffff81
-     d48:	c4 62 7d 18 15 58 00 	vbroadcastss ymm10,DWORD PTR [rip+0x58]        # da9 <avx2k_pow_ps+0xb9>
-     d4f:	00 00 
-     d51:	c4 62 7d 18 1d 7c 00 	vbroadcastss ymm11,DWORD PTR [rip+0x7c]        # dd6 <avx2k_pow_ps+0xe6>
-     d58:	00 00 
-     d5a:	c4 c1 7c 10 18       	vmovups ymm3,YMMWORD PTR [r8]
-     d5f:	c5 ec 5f c0          	vmaxps ymm0,ymm2,ymm0
-     d63:	c5 6c c2 c5 02       	vcmpleps ymm8,ymm2,ymm5
-     d68:	c4 e2 7d 18 25 2c 00 	vbroadcastss ymm4,DWORD PTR [rip+0x2c]        # d9d <avx2k_pow_ps+0xad>
-     d6f:	00 00 
-     d71:	48 89 c8             	mov    rax,rcx
-     d74:	c5 c5 72 d0 17       	vpsrld ymm7,ymm0,0x17
-     d79:	c5 fc 54 c1          	vandps ymm0,ymm0,ymm1
-     d7d:	c5 f9 6e ca          	vmovd  xmm1,edx
-     d81:	c5 fc 56 c6          	vorps  ymm0,ymm0,ymm6
-     d85:	c4 e2 7d 58 c9       	vpbroadcastd ymm1,xmm1
-     d8a:	c4 41 7c c2 c9 01    	vcmpltps ymm9,ymm0,ymm9
-     d90:	c5 c5 fe f9          	vpaddd ymm7,ymm7,ymm1
-     d94:	c5 fc 5b ff          	vcvtdq2ps ymm7,ymm7
-     d98:	c5 c4 58 fc          	vaddps ymm7,ymm7,ymm4
-     d9c:	c4 c1 7c 54 c9       	vandps ymm1,ymm0,ymm9
-     da1:	c4 c1 7c 58 c2       	vaddps ymm0,ymm0,ymm10
-     da6:	c4 41 5c 54 c9       	vandps ymm9,ymm4,ymm9
-     dab:	c4 c1 44 5c f9       	vsubps ymm7,ymm7,ymm9
-     db0:	c5 64 c2 cd 01       	vcmpltps ymm9,ymm3,ymm5
-     db5:	c5 fc 58 c1          	vaddps ymm0,ymm0,ymm1
-     db9:	c4 e2 7d 18 0d 78 00 	vbroadcastss ymm1,DWORD PTR [rip+0x78]        # e3a <avx2k_pow_ps+0x14a>
-     dc0:	00 00 
-     dc2:	c5 7c 59 d0          	vmulps ymm10,ymm0,ymm0
-     dc6:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     dcb:	c4 62 7d 18 1d 80 00 	vbroadcastss ymm11,DWORD PTR [rip+0x80]        # e54 <avx2k_pow_ps+0x164>
-     dd2:	00 00 
-     dd4:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     dd9:	c4 62 7d 18 1d 84 00 	vbroadcastss ymm11,DWORD PTR [rip+0x84]        # e66 <avx2k_pow_ps+0x176>
-     de0:	00 00 
-     de2:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     de7:	c4 62 7d 18 1d 88 00 	vbroadcastss ymm11,DWORD PTR [rip+0x88]        # e78 <avx2k_pow_ps+0x188>
-     dee:	00 00 
-     df0:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     df5:	c4 62 7d 18 1d 8c 00 	vbroadcastss ymm11,DWORD PTR [rip+0x8c]        # e8a <avx2k_pow_ps+0x19a>
-     dfc:	00 00 
-     dfe:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     e03:	c4 62 7d 18 1d 90 00 	vbroadcastss ymm11,DWORD PTR [rip+0x90]        # e9c <avx2k_pow_ps+0x1ac>
-     e0a:	00 00 
-     e0c:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     e11:	c4 62 7d 18 1d 94 00 	vbroadcastss ymm11,DWORD PTR [rip+0x94]        # eae <avx2k_pow_ps+0x1be>
-     e18:	00 00 
-     e1a:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     e1f:	c4 62 7d 18 1d 98 00 	vbroadcastss ymm11,DWORD PTR [rip+0x98]        # ec0 <avx2k_pow_ps+0x1d0>
-     e26:	00 00 
-     e28:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
-     e2d:	c5 fc 59 c9          	vmulps ymm1,ymm0,ymm1
-     e31:	c4 c1 74 59 ca       	vmulps ymm1,ymm1,ymm10
-     e36:	c4 62 75 9c d6       	vfnmadd132ps ymm10,ymm1,ymm6
-     e3b:	c4 e2 7d 18 0d 08 00 	vbroadcastss ymm1,DWORD PTR [rip+0x8]        # e4c <avx2k_pow_ps+0x15c>
-     e42:	00 00 
-     e44:	c4 c1 7c 58 c2       	vaddps ymm0,ymm0,ymm10
-     e49:	c5 64 c2 d3 03       	vcmpunordps ymm10,ymm3,ymm3
-     e4e:	c4 e2 45 98 c1       	vfmadd132ps ymm0,ymm7,ymm1
-     e53:	c4 e2 7d 18 0d 30 00 	vbroadcastss ymm1,DWORD PTR [rip+0x30]        # e8c <avx2k_pow_ps+0x19c>
-     e5a:	00 00 
-     e5c:	c4 c1 7c 56 c0       	vorps  ymm0,ymm0,ymm8
-     e61:	c4 62 7d 18 05 18 00 	vbroadcastss ymm8,DWORD PTR [rip+0x18]        # e82 <avx2k_pow_ps+0x192>
-     e68:	00 00 
-     e6a:	c5 e4 59 c0          	vmulps ymm0,ymm3,ymm0
-     e6e:	c5 e4 c2 dd 00       	vcmpeqps ymm3,ymm3,ymm5
-     e73:	c5 fc 5d c1          	vminps ymm0,ymm0,ymm1
-     e77:	c4 e2 7d 18 0d 34 00 	vbroadcastss ymm1,DWORD PTR [rip+0x34]        # eb4 <avx2k_pow_ps+0x1c4>
-     e7e:	00 00 
-     e80:	c5 fc 5f c1          	vmaxps ymm0,ymm0,ymm1
-     e84:	c4 e2 7d 18 0d 38 00 	vbroadcastss ymm1,DWORD PTR [rip+0x38]        # ec5 <avx2k_pow_ps+0x1d5>
-     e8b:	00 00 
-     e8d:	c4 e3 7d 08 f8 08    	vroundps ymm7,ymm0,0x8
-     e93:	c5 fc 5c c7          	vsubps ymm0,ymm0,ymm7
-     e97:	c5 fe 5b ff          	vcvttps2dq ymm7,ymm7
-     e9b:	c5 fc 59 c1          	vmulps ymm0,ymm0,ymm1
-     e9f:	c4 e2 7d 18 0d 14 00 	vbroadcastss ymm1,DWORD PTR [rip+0x14]        # ebc <avx2k_pow_ps+0x1cc>
-     ea6:	00 00 
-     ea8:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
-     ead:	c4 62 7d 18 05 1c 00 	vbroadcastss ymm8,DWORD PTR [rip+0x1c]        # ed2 <avx2k_pow_ps+0x1e2>
-     eb4:	00 00 
-     eb6:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
-     ebb:	c4 62 7d 18 05 20 00 	vbroadcastss ymm8,DWORD PTR [rip+0x20]        # ee4 <avx2k_pow_ps+0x1f4>
-     ec2:	00 00 
-     ec4:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
-     ec9:	c4 62 7d 18 05 24 00 	vbroadcastss ymm8,DWORD PTR [rip+0x24]        # ef6 <avx2k_pow_ps+0x206>
-     ed0:	00 00 
-     ed2:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
-     ed7:	c5 6c c2 c5 00       	vcmpeqps ymm8,ymm2,ymm5
-     edc:	c4 e2 4d 98 c8       	vfmadd132ps ymm1,ymm6,ymm0
-     ee1:	c5 fc 59 f0          	vmulps ymm6,ymm0,ymm0
-     ee5:	c4 e2 75 b8 c6       	vfmadd231ps ymm0,ymm1,ymm6
-     eea:	c5 ec c2 f5 01       	vcmpltps ymm6,ymm2,ymm5
-     eef:	c5 f5 76 c9          	vpcmpeqd ymm1,ymm1,ymm1
-     ef3:	c5 f5 72 d1 19       	vpsrld ymm1,ymm1,0x19
-     ef8:	c5 c5 fe f9          	vpaddd ymm7,ymm7,ymm1
-     efc:	c5 f1 ef c9          	vpxor  xmm1,xmm1,xmm1
-     f00:	c5 c5 72 f7 17       	vpslld ymm7,ymm7,0x17
-     f05:	c5 f5 66 db          	vpcmpgtd ymm3,ymm1,ymm3
-     f09:	c5 fc 58 c4          	vaddps ymm0,ymm0,ymm4
-     f0d:	c5 fc 59 c7          	vmulps ymm0,ymm0,ymm7
-     f11:	c4 e2 7d 18 3d a8 00 	vbroadcastss ymm7,DWORD PTR [rip+0xa8]        # fc2 <avx2k_exp_pd+0x32>
-     f18:	00 00 
-     f1a:	c4 e3 7d 4a c7 60    	vblendvps ymm0,ymm0,ymm7,ymm6
-     f20:	c5 ec c2 f2 03       	vcmpunordps ymm6,ymm2,ymm2
-     f25:	c5 ec c2 d4 00       	vcmpeqps ymm2,ymm2,ymm4
-     f2a:	c4 c1 4c 56 f2       	vorps  ymm6,ymm6,ymm10
-     f2f:	c5 f5 66 d2          	vpcmpgtd ymm2,ymm1,ymm2
-     f33:	c4 c1 75 66 c9       	vpcmpgtd ymm1,ymm1,ymm9
-     f38:	c5 ed eb d3          	vpor   ymm2,ymm2,ymm3
-     f3c:	c4 e2 7d 18 1d 68 00 	vbroadcastss ymm3,DWORD PTR [rip+0x68]        # fad <avx2k_exp_pd+0x1d>
-     f43:	00 00 
-     f45:	c5 e4 54 c9          	vandps ymm1,ymm3,ymm1
-     f49:	c4 e3 7d 4a c1 80    	vblendvps ymm0,ymm0,ymm1,ymm8
-     f4f:	c4 e3 7d 4a c7 60    	vblendvps ymm0,ymm0,ymm7,ymm6
-     f55:	c4 e3 7d 4a c4 20    	vblendvps ymm0,ymm0,ymm4,ymm2
-     f5b:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
-     f5f:	c5 f8 77             	vzeroupper
-     f62:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
-     f67:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
-     f6d:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
-     f73:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
-     f79:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
-     f7f:	c5 78 10 5c 24 50    	vmovups xmm11,XMMWORD PTR [rsp+0x50]
-     f85:	48 83 c4 68          	add    rsp,0x68
-     f89:	c3                   	ret
-     f8a:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+     cf9:	c4 e2 7d 18 0d 28 00 	vbroadcastss ymm1,DWORD PTR [rip+0x28]        # d2a <avx2k_rsqrt_ps+0x3a>
+     d00:	00 00 
+     d02:	c4 e2 7d 18 25 c4 00 	vbroadcastss ymm4,DWORD PTR [rip+0xc4]        # dcf <avx2k_cbrt_ps+0x3f>
+     d09:	00 00 
+     d0b:	c5 fc 10 12          	vmovups ymm2,YMMWORD PTR [rdx]
+     d0f:	c5 ec 59 c9          	vmulps ymm1,ymm2,ymm1
+     d13:	c5 fc 52 c2          	vrsqrtps ymm0,ymm2
+     d17:	48 89 c8             	mov    rax,rcx
+     d1a:	c5 fc 59 d9          	vmulps ymm3,ymm0,ymm1
+     d1e:	c4 e2 5d 9c d8       	vfnmadd132ps ymm3,ymm4,ymm0
+     d23:	c5 fc 59 c3          	vmulps ymm0,ymm0,ymm3
+     d27:	c5 e0 57 db          	vxorps xmm3,xmm3,xmm3
+     d2b:	c5 ec c2 f3 00       	vcmpeqps ymm6,ymm2,ymm3
+     d30:	c5 f4 59 c8          	vmulps ymm1,ymm1,ymm0
+     d34:	c4 e2 5d 9c c8       	vfnmadd132ps ymm1,ymm4,ymm0
+     d39:	c4 e2 7d 18 25 68 00 	vbroadcastss ymm4,DWORD PTR [rip+0x68]        # daa <avx2k_cbrt_ps+0x1a>
+     d40:	00 00 
+     d42:	c5 ec c2 ec 00       	vcmpeqps ymm5,ymm2,ymm4
+     d47:	c5 ec c2 d3 01       	vcmpltps ymm2,ymm2,ymm3
+     d4c:	c5 fc 59 c1          	vmulps ymm0,ymm0,ymm1
+     d50:	c4 e2 7d 18 0d a8 00 	vbroadcastss ymm1,DWORD PTR [rip+0xa8]        # e01 <avx2k_cbrt_ps+0x71>
+     d57:	00 00 
+     d59:	c4 e3 7d 4a c4 60    	vblendvps ymm0,ymm0,ymm4,ymm6
+     d5f:	c4 e3 7d 4a c3 50    	vblendvps ymm0,ymm0,ymm3,ymm5
+     d65:	c4 e3 7d 4a c1 20    	vblendvps ymm0,ymm0,ymm1,ymm2
+     d6b:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
+     d6f:	c5 f8 77             	vzeroupper
+     d72:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+     d77:	48 83 c4 18          	add    rsp,0x18
+     d7b:	c3                   	ret
+     d7c:	0f 1f 40 00          	nop    DWORD PTR [rax+0x0]
 
-0000000000000f90 <avx2k_exp_pd>:
-     f90:	48 83 ec 38          	sub    rsp,0x38
-     f94:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
-     f99:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
-     f9f:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
-     fa5:	c4 e2 7d 19 15 c8 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xc8]        # 1076 <avx2k_exp_pd+0xe6>
-     fac:	00 00 
-     fae:	c4 e2 7d 19 0d d0 00 	vbroadcastsd ymm1,QWORD PTR [rip+0xd0]        # 1087 <avx2k_exp_pd+0xf7>
-     fb5:	00 00 
-     fb7:	c4 e2 7d 19 35 f8 00 	vbroadcastsd ymm6,QWORD PTR [rip+0xf8]        # 10b8 <avx2k_exp_pd+0x128>
-     fbe:	00 00 
-     fc0:	c4 62 7d 19 05 00 01 	vbroadcastsd ymm8,QWORD PTR [rip+0x100]        # 10c9 <avx2k_exp_pd+0x139>
-     fc7:	00 00 
-     fc9:	c5 fd 10 02          	vmovupd ymm0,YMMWORD PTR [rdx]
-     fcd:	c5 fd c2 ea 1e       	vcmpgt_oqpd ymm5,ymm0,ymm2
-     fd2:	c5 fd c2 e1 11       	vcmplt_oqpd ymm4,ymm0,ymm1
-     fd7:	c5 fd c2 d8 03       	vcmpunordpd ymm3,ymm0,ymm0
-     fdc:	c5 fd 5d c2          	vminpd ymm0,ymm0,ymm2
-     fe0:	c4 e2 7d 19 15 e0 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xe0]        # 10c9 <avx2k_exp_pd+0x139>
-     fe7:	00 00 
-     fe9:	48 89 c8             	mov    rax,rcx
-     fec:	c5 fd 5f c9          	vmaxpd ymm1,ymm0,ymm1
-     ff0:	c4 e2 7d 19 05 d8 00 	vbroadcastsd ymm0,QWORD PTR [rip+0xd8]        # 10d1 <avx2k_exp_pd+0x141>
-     ff7:	00 00 
-     ff9:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
-     ffd:	c4 e3 7d 09 c0 08    	vroundpd ymm0,ymm0,0x8
-    1003:	c4 e2 f5 9c d0       	vfnmadd132pd ymm2,ymm1,ymm0
-    1008:	c4 e2 7d 19 0d e8 00 	vbroadcastsd ymm1,QWORD PTR [rip+0xe8]        # 10f9 <avx2k_log_pd+0x9>
-    100f:	00 00 
-    1011:	c4 e2 ed 9c c8       	vfnmadd132pd ymm1,ymm2,ymm0
-    1016:	c5 ff e6 c0          	vcvtpd2dq xmm0,ymm0
-    101a:	c4 e2 7d 19 15 f0 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xf0]        # 1113 <avx2k_log_pd+0x23>
-    1021:	00 00 
-    1023:	c5 f5 59 f9          	vmulpd ymm7,ymm1,ymm1
-    1027:	c4 e2 cd 98 d7       	vfmadd132pd ymm2,ymm6,ymm7
-    102c:	c4 e2 7d 19 35 08 01 	vbroadcastsd ymm6,QWORD PTR [rip+0x108]        # 113d <avx2k_log_pd+0x4d>
-    1033:	00 00 
-    1035:	c4 e2 bd 98 d7       	vfmadd132pd ymm2,ymm8,ymm7
-    103a:	c5 f5 59 d2          	vmulpd ymm2,ymm1,ymm2
-    103e:	c4 e2 7d 19 0d 10 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x110]        # 1157 <avx2k_log_pd+0x67>
-    1045:	00 00 
-    1047:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
-    104c:	c4 e2 7d 19 0d 18 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x118]        # 116d <avx2k_log_pd+0x7d>
-    1053:	00 00 
-    1055:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
-    105a:	c4 e2 7d 19 0d 20 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x120]        # 1183 <avx2k_log_pd+0x93>
-    1061:	00 00 
-    1063:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
-    1068:	c4 e2 7d 59 3d 38 01 	vpbroadcastq ymm7,QWORD PTR [rip+0x138]        # 11a9 <avx2k_log_pd+0xb9>
-    106f:	00 00 
-    1071:	c5 cd 5c f2          	vsubpd ymm6,ymm6,ymm2
-    1075:	c5 ed 5e d6          	vdivpd ymm2,ymm2,ymm6
-    1079:	c4 e2 bd 98 ca       	vfmadd132pd ymm1,ymm8,ymm2
-    107e:	c5 e9 72 e0 01       	vpsrad xmm2,xmm0,0x1
-    1083:	c4 e2 7d 25 f2       	vpmovsxdq ymm6,xmm2
-    1088:	c5 f9 fa d2          	vpsubd xmm2,xmm0,xmm2
-    108c:	c5 cd d4 c7          	vpaddq ymm0,ymm6,ymm7
-    1090:	c4 e2 7d 25 d2       	vpmovsxdq ymm2,xmm2
-    1095:	c5 fd 73 f0 34       	vpsllq ymm0,ymm0,0x34
-    109a:	c5 ed d4 d7          	vpaddq ymm2,ymm2,ymm7
-    109e:	c5 ed 73 f2 34       	vpsllq ymm2,ymm2,0x34
-    10a3:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
-    10a7:	c4 e2 7d 19 0d 28 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x128]        # 11d8 <avx2k_log_pd+0xe8>
+0000000000000d80 <avx2k_sqrt_ps>:
+     d80:	c5 fc 51 02          	vsqrtps ymm0,YMMWORD PTR [rdx]
+     d84:	48 89 c8             	mov    rax,rcx
+     d87:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
+     d8b:	c5 f8 77             	vzeroupper
+     d8e:	c3                   	ret
+     d8f:	90                   	nop
+
+0000000000000d90 <avx2k_cbrt_ps>:
+     d90:	48 83 ec 18          	sub    rsp,0x18
+     d94:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+     d99:	c4 e2 7d 18 0d 5c 00 	vbroadcastss ymm1,DWORD PTR [rip+0x5c]        # dfe <avx2k_cbrt_ps+0x6e>
+     da0:	00 00 
+     da2:	c5 fc 10 1a          	vmovups ymm3,YMMWORD PTR [rdx]
+     da6:	ba ab aa aa aa       	mov    edx,0xaaaaaaab
+     dab:	c5 f9 6e ea          	vmovd  xmm5,edx
+     daf:	ba 67 40 51 2a       	mov    edx,0x2a514067
+     db4:	c5 e4 54 e1          	vandps ymm4,ymm3,ymm1
+     db8:	c5 f4 55 cb          	vandnps ymm1,ymm1,ymm3
+     dbc:	c4 e2 7d 58 ed       	vpbroadcastd ymm5,xmm5
+     dc1:	c5 ed 73 d1 20       	vpsrlq ymm2,ymm1,0x20
+     dc6:	c5 f5 f4 c5          	vpmuludq ymm0,ymm1,ymm5
+     dca:	c5 ed f4 d5          	vpmuludq ymm2,ymm2,ymm5
+     dce:	48 89 c8             	mov    rax,rcx
+     dd1:	c4 e2 7d 18 2d 2c 01 	vbroadcastss ymm5,DWORD PTR [rip+0x12c]        # f06 <avx2k_softplus_ps+0x86>
+     dd8:	00 00 
+     dda:	c5 fd 73 d0 21       	vpsrlq ymm0,ymm0,0x21
+     ddf:	c5 ed 73 d2 21       	vpsrlq ymm2,ymm2,0x21
+     de4:	c5 ed 73 f2 20       	vpsllq ymm2,ymm2,0x20
+     de9:	c5 fd eb c2          	vpor   ymm0,ymm0,ymm2
+     ded:	c5 f9 6e d2          	vmovd  xmm2,edx
+     df1:	c4 e2 7d 58 d2       	vpbroadcastd ymm2,xmm2
+     df6:	c5 fd fe c2          	vpaddd ymm0,ymm0,ymm2
+     dfa:	c5 fc 28 d5          	vmovaps ymm2,ymm5
+     dfe:	c5 fc 59 f0          	vmulps ymm6,ymm0,ymm0
+     e02:	c5 cc 59 f0          	vmulps ymm6,ymm6,ymm0
+     e06:	c4 e2 4d 98 d1       	vfmadd132ps ymm2,ymm6,ymm1
+     e0b:	c4 e2 75 98 f5       	vfmadd132ps ymm6,ymm1,ymm5
+     e10:	c5 ec 5e d6          	vdivps ymm2,ymm2,ymm6
+     e14:	c5 ec 59 d0          	vmulps ymm2,ymm2,ymm0
+     e18:	c5 fc 28 c5          	vmovaps ymm0,ymm5
+     e1c:	c5 ec 59 f2          	vmulps ymm6,ymm2,ymm2
+     e20:	c5 cc 59 f2          	vmulps ymm6,ymm6,ymm2
+     e24:	c4 e2 75 98 ee       	vfmadd132ps ymm5,ymm1,ymm6
+     e29:	c4 e2 4d 98 c1       	vfmadd132ps ymm0,ymm6,ymm1
+     e2e:	c5 e4 c2 f3 03       	vcmpunordps ymm6,ymm3,ymm3
+     e33:	c5 fc 5e c5          	vdivps ymm0,ymm0,ymm5
+     e37:	c5 d0 57 ed          	vxorps xmm5,xmm5,xmm5
+     e3b:	c5 f4 c2 ed 00       	vcmpeqps ymm5,ymm1,ymm5
+     e40:	c5 fc 59 c2          	vmulps ymm0,ymm0,ymm2
+     e44:	c4 e2 7d 18 15 68 00 	vbroadcastss ymm2,DWORD PTR [rip+0x68]        # eb5 <avx2k_softplus_ps+0x35>
+     e4b:	00 00 
+     e4d:	c5 f4 c2 ca 00       	vcmpeqps ymm1,ymm1,ymm2
+     e52:	c5 ec 56 d4          	vorps  ymm2,ymm2,ymm4
+     e56:	c5 fc 56 c4          	vorps  ymm0,ymm0,ymm4
+     e5a:	c4 e3 7d 4a c4 50    	vblendvps ymm0,ymm0,ymm4,ymm5
+     e60:	c4 e3 7d 4a c2 10    	vblendvps ymm0,ymm0,ymm2,ymm1
+     e66:	c4 e3 7d 4a c3 60    	vblendvps ymm0,ymm0,ymm3,ymm6
+     e6c:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
+     e70:	c5 f8 77             	vzeroupper
+     e73:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+     e78:	48 83 c4 18          	add    rsp,0x18
+     e7c:	c3                   	ret
+     e7d:	0f 1f 00             	nop    DWORD PTR [rax]
+
+0000000000000e80 <avx2k_softplus_ps>:
+     e80:	48 81 ec 88 00 00 00 	sub    rsp,0x88
+     e87:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+     e8c:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
+     e92:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
+     e98:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
+     e9e:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
+     ea4:	c5 78 11 5c 24 50    	vmovups XMMWORD PTR [rsp+0x50],xmm11
+     eaa:	c5 78 11 64 24 60    	vmovups XMMWORD PTR [rsp+0x60],xmm12
+     eb0:	c5 78 11 6c 24 70    	vmovups XMMWORD PTR [rsp+0x70],xmm13
+     eb6:	c5 c0 57 ff          	vxorps xmm7,xmm7,xmm7
+     eba:	c4 e2 7d 18 05 5c 00 	vbroadcastss ymm0,DWORD PTR [rip+0x5c]        # f1f <avx2k_softplus_ps+0x9f>
+     ec1:	00 00 
+     ec3:	c4 e2 7d 18 15 08 00 	vbroadcastss ymm2,DWORD PTR [rip+0x8]        # ed4 <avx2k_softplus_ps+0x54>
+     eca:	00 00 
+     ecc:	c4 62 7d 18 25 0c 00 	vbroadcastss ymm12,DWORD PTR [rip+0xc]        # ee1 <avx2k_softplus_ps+0x61>
+     ed3:	00 00 
+     ed5:	c4 62 7d 18 15 10 00 	vbroadcastss ymm10,DWORD PTR [rip+0x10]        # eee <avx2k_softplus_ps+0x6e>
+     edc:	00 00 
+     ede:	c4 e2 7d 18 1d 18 00 	vbroadcastss ymm3,DWORD PTR [rip+0x18]        # eff <avx2k_softplus_ps+0x7f>
+     ee5:	00 00 
+     ee7:	c5 fc 10 32          	vmovups ymm6,YMMWORD PTR [rdx]
+     eeb:	ba 81 ff ff ff       	mov    edx,0xffffff81
+     ef0:	c4 62 7d 18 1d 28 00 	vbroadcastss ymm11,DWORD PTR [rip+0x28]        # f21 <avx2k_softplus_ps+0xa1>
+     ef7:	00 00 
+     ef9:	c4 e2 7d 18 2d 2c 00 	vbroadcastss ymm5,DWORD PTR [rip+0x2c]        # f2e <avx2k_softplus_ps+0xae>
+     f00:	00 00 
+     f02:	c5 c4 c2 ce 01       	vcmpltps ymm1,ymm7,ymm6
+     f07:	c5 fc 55 c6          	vandnps ymm0,ymm0,ymm6
+     f0b:	c4 62 7d 18 05 58 00 	vbroadcastss ymm8,DWORD PTR [rip+0x58]        # f6c <avx2k_softplus_ps+0xec>
+     f12:	00 00 
+     f14:	c4 62 7d 18 2d 7c 00 	vbroadcastss ymm13,DWORD PTR [rip+0x7c]        # f99 <avx2k_softplus_ps+0x119>
+     f1b:	00 00 
+     f1d:	c5 c4 5c c0          	vsubps ymm0,ymm7,ymm0
+     f21:	48 89 c8             	mov    rax,rcx
+     f24:	c5 cc 54 f1          	vandps ymm6,ymm6,ymm1
+     f28:	c4 e2 7d 18 0d 00 00 	vbroadcastss ymm1,DWORD PTR [rip+0x0]        # f31 <avx2k_softplus_ps+0xb1>
+     f2f:	00 00 
+     f31:	c5 fc 5d c1          	vminps ymm0,ymm0,ymm1
+     f35:	c4 e2 7d 18 0d 04 00 	vbroadcastss ymm1,DWORD PTR [rip+0x4]        # f42 <avx2k_softplus_ps+0xc2>
+     f3c:	00 00 
+     f3e:	c5 fc 5f c1          	vmaxps ymm0,ymm0,ymm1
+     f42:	c4 e2 7d 18 0d 14 00 	vbroadcastss ymm1,DWORD PTR [rip+0x14]        # f5f <avx2k_softplus_ps+0xdf>
+     f49:	00 00 
+     f4b:	c5 fc 59 d2          	vmulps ymm2,ymm0,ymm2
+     f4f:	c4 e3 7d 08 d2 08    	vroundps ymm2,ymm2,0x8
+     f55:	c4 c2 6d bc c4       	vfnmadd231ps ymm0,ymm2,ymm12
+     f5a:	c4 c2 6d bc c2       	vfnmadd231ps ymm0,ymm2,ymm10
+     f5f:	c5 fe 5b d2          	vcvttps2dq ymm2,ymm2
+     f63:	c4 e2 65 98 c8       	vfmadd132ps ymm1,ymm3,ymm0
+     f68:	c4 e2 7d 18 1d 1c 00 	vbroadcastss ymm3,DWORD PTR [rip+0x1c]        # f8d <avx2k_softplus_ps+0x10d>
+     f6f:	00 00 
+     f71:	c4 e2 65 98 c8       	vfmadd132ps ymm1,ymm3,ymm0
+     f76:	c4 e2 7d 18 1d 20 00 	vbroadcastss ymm3,DWORD PTR [rip+0x20]        # f9f <avx2k_softplus_ps+0x11f>
+     f7d:	00 00 
+     f7f:	c4 e2 65 98 c8       	vfmadd132ps ymm1,ymm3,ymm0
+     f84:	c4 e2 7d 18 1d 24 00 	vbroadcastss ymm3,DWORD PTR [rip+0x24]        # fb1 <avx2k_softplus_ps+0x131>
+     f8b:	00 00 
+     f8d:	c4 e2 65 98 c8       	vfmadd132ps ymm1,ymm3,ymm0
+     f92:	c5 fc 59 d8          	vmulps ymm3,ymm0,ymm0
+     f96:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+     f9b:	c4 e2 7d 98 cb       	vfmadd132ps ymm1,ymm0,ymm3
+     fa0:	c5 fd 76 c0          	vpcmpeqd ymm0,ymm0,ymm0
+     fa4:	c5 fd 72 d0 19       	vpsrld ymm0,ymm0,0x19
+     fa9:	c5 ed fe d0          	vpaddd ymm2,ymm2,ymm0
+     fad:	c4 e2 7d 18 05 6c 00 	vbroadcastss ymm0,DWORD PTR [rip+0x6c]        # 1022 <avx2k_softplus_ps+0x1a2>
+     fb4:	00 00 
+     fb6:	c5 ed 72 f2 17       	vpslld ymm2,ymm2,0x17
+     fbb:	c5 f4 58 cd          	vaddps ymm1,ymm1,ymm5
+     fbf:	c5 f4 59 ca          	vmulps ymm1,ymm1,ymm2
+     fc3:	c4 e2 7d 18 15 70 00 	vbroadcastss ymm2,DWORD PTR [rip+0x70]        # 103c <avx2k_softplus_ps+0x1bc>
+     fca:	00 00 
+     fcc:	c5 f4 58 dd          	vaddps ymm3,ymm1,ymm5
+     fd0:	c5 e4 5f c0          	vmaxps ymm0,ymm3,ymm0
+     fd4:	c5 e4 c2 ff 02       	vcmpleps ymm7,ymm3,ymm7
+     fd9:	c5 dd 72 d0 17       	vpsrld ymm4,ymm0,0x17
+     fde:	c5 fc 54 c2          	vandps ymm0,ymm0,ymm2
+     fe2:	c5 f9 6e d2          	vmovd  xmm2,edx
+     fe6:	c4 e2 7d 58 d2       	vpbroadcastd ymm2,xmm2
+     feb:	c4 c1 7c 56 c3       	vorps  ymm0,ymm0,ymm11
+     ff0:	c5 dd fe e2          	vpaddd ymm4,ymm4,ymm2
+     ff4:	c4 e2 7d 18 15 74 00 	vbroadcastss ymm2,DWORD PTR [rip+0x74]        # 1071 <avx2k_softplus_ps+0x1f1>
+     ffb:	00 00 
+     ffd:	c5 fc 5b e4          	vcvtdq2ps ymm4,ymm4
+    1001:	c5 dc 58 e5          	vaddps ymm4,ymm4,ymm5
+    1005:	c5 fc c2 d2 01       	vcmpltps ymm2,ymm0,ymm2
+    100a:	c5 7c 54 ca          	vandps ymm9,ymm0,ymm2
+    100e:	c4 c1 7c 58 c0       	vaddps ymm0,ymm0,ymm8
+    1013:	c5 d4 54 d2          	vandps ymm2,ymm5,ymm2
+    1017:	c5 dc 5c e2          	vsubps ymm4,ymm4,ymm2
+    101b:	c5 e4 c2 ed 00       	vcmpeqps ymm5,ymm3,ymm5
+    1020:	c4 e2 7d 18 15 78 00 	vbroadcastss ymm2,DWORD PTR [rip+0x78]        # 10a1 <avx2k_softplus_ps+0x221>
+    1027:	00 00 
+    1029:	c4 c1 7c 58 c1       	vaddps ymm0,ymm0,ymm9
+    102e:	c5 7c 59 c8          	vmulps ymm9,ymm0,ymm0
+    1032:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    1037:	c4 62 7d 18 2d 80 00 	vbroadcastss ymm13,DWORD PTR [rip+0x80]        # 10c0 <avx2k_softplus_ps+0x240>
+    103e:	00 00 
+    1040:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    1045:	c4 62 7d 18 2d 84 00 	vbroadcastss ymm13,DWORD PTR [rip+0x84]        # 10d2 <avx2k_softplus_ps+0x252>
+    104c:	00 00 
+    104e:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    1053:	c4 62 7d 18 2d 88 00 	vbroadcastss ymm13,DWORD PTR [rip+0x88]        # 10e4 <avx2k_softplus_ps+0x264>
+    105a:	00 00 
+    105c:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    1061:	c4 62 7d 18 2d 8c 00 	vbroadcastss ymm13,DWORD PTR [rip+0x8c]        # 10f6 <avx2k_softplus_ps+0x276>
+    1068:	00 00 
+    106a:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    106f:	c4 62 7d 18 2d 90 00 	vbroadcastss ymm13,DWORD PTR [rip+0x90]        # 1108 <avx2k_softplus_ps+0x288>
+    1076:	00 00 
+    1078:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    107d:	c4 62 7d 18 2d 94 00 	vbroadcastss ymm13,DWORD PTR [rip+0x94]        # 111a <avx2k_softplus_ps+0x29a>
+    1084:	00 00 
+    1086:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    108b:	c4 62 7d 18 2d 98 00 	vbroadcastss ymm13,DWORD PTR [rip+0x98]        # 112c <avx2k_softplus_ps+0x2ac>
+    1092:	00 00 
+    1094:	c4 e2 15 98 d0       	vfmadd132ps ymm2,ymm13,ymm0
+    1099:	c5 fc 59 d2          	vmulps ymm2,ymm0,ymm2
+    109d:	c4 c1 6c 59 d1       	vmulps ymm2,ymm2,ymm9
+    10a2:	c4 62 6d 98 d4       	vfmadd132ps ymm10,ymm2,ymm4
+    10a7:	c4 e2 7d 18 15 68 00 	vbroadcastss ymm2,DWORD PTR [rip+0x68]        # 1118 <avx2k_softplus_ps+0x298>
     10ae:	00 00 
-    10b0:	c5 fd 59 c2          	vmulpd ymm0,ymm0,ymm2
-    10b4:	c4 e3 7d 4b c1 50    	vblendvpd ymm0,ymm0,ymm1,ymm5
-    10ba:	c5 f1 57 c9          	vxorpd xmm1,xmm1,xmm1
-    10be:	c4 e3 7d 4b c1 40    	vblendvpd ymm0,ymm0,ymm1,ymm4
-    10c4:	c4 e2 7d 19 0d 30 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x130]        # 11fd <avx2k_log_pd+0x10d>
-    10cb:	00 00 
-    10cd:	c4 e3 7d 4b c1 30    	vblendvpd ymm0,ymm0,ymm1,ymm3
-    10d3:	c5 fd 11 01          	vmovupd YMMWORD PTR [rcx],ymm0
-    10d7:	c5 f8 77             	vzeroupper
-    10da:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
-    10df:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
-    10e5:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
-    10eb:	48 83 c4 38          	add    rsp,0x38
-    10ef:	c3                   	ret
+    10b0:	c4 42 2d 9c cb       	vfnmadd132ps ymm9,ymm10,ymm11
+    10b5:	c4 41 74 c2 d0 00    	vcmpeqps ymm10,ymm1,ymm8
+    10bb:	c4 c1 7c 58 c1       	vaddps ymm0,ymm0,ymm9
+    10c0:	c4 41 74 c2 c8 01    	vcmpltps ymm9,ymm1,ymm8
+    10c6:	c4 c2 7d 98 e4       	vfmadd132ps ymm4,ymm0,ymm12
+    10cb:	c4 c1 64 58 c0       	vaddps ymm0,ymm3,ymm8
+    10d0:	c5 f4 5e c0          	vdivps ymm0,ymm1,ymm0
+    10d4:	c5 dc 56 e7          	vorps  ymm4,ymm4,ymm7
+    10d8:	c5 f4 c2 fa 00       	vcmpeqps ymm7,ymm1,ymm2
+    10dd:	c5 fc 59 c4          	vmulps ymm0,ymm0,ymm4
+    10e1:	c4 e3 7d 4a c1 50    	vblendvps ymm0,ymm0,ymm1,ymm5
+    10e7:	c4 e2 7d 18 0d a4 00 	vbroadcastss ymm1,DWORD PTR [rip+0xa4]        # 1194 <avx2k_gelu_ps+0x44>
+    10ee:	00 00 
+    10f0:	c4 e3 7d 4a c1 a0    	vblendvps ymm0,ymm0,ymm1,ymm10
+    10f6:	c4 e2 7d 18 0d a8 00 	vbroadcastss ymm1,DWORD PTR [rip+0xa8]        # 11a7 <avx2k_gelu_ps+0x57>
+    10fd:	00 00 
+    10ff:	c4 e3 7d 4a c1 90    	vblendvps ymm0,ymm0,ymm1,ymm9
+    1105:	c4 e3 7d 4a c2 70    	vblendvps ymm0,ymm0,ymm2,ymm7
+    110b:	c5 fc 58 c6          	vaddps ymm0,ymm0,ymm6
+    110f:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
+    1113:	c5 f8 77             	vzeroupper
+    1116:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+    111b:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
+    1121:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
+    1127:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
+    112d:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
+    1133:	c5 78 10 5c 24 50    	vmovups xmm11,XMMWORD PTR [rsp+0x50]
+    1139:	c5 78 10 64 24 60    	vmovups xmm12,XMMWORD PTR [rsp+0x60]
+    113f:	c5 78 10 6c 24 70    	vmovups xmm13,XMMWORD PTR [rsp+0x70]
+    1145:	48 81 c4 88 00 00 00 	add    rsp,0x88
+    114c:	c3                   	ret
+    114d:	0f 1f 00             	nop    DWORD PTR [rax]
 
-00000000000010f0 <avx2k_log_pd>:
-    10f0:	48 83 ec 68          	sub    rsp,0x68
-    10f4:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
-    10f9:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
-    10ff:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
-    1105:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
-    110b:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
-    1111:	c5 78 11 5c 24 50    	vmovups XMMWORD PTR [rsp+0x50],xmm11
-    1117:	c5 d9 57 e4          	vxorpd xmm4,xmm4,xmm4
-    111b:	c5 d1 ef ed          	vpxor  xmm5,xmm5,xmm5
-    111f:	c4 e2 7d 19 05 48 01 	vbroadcastsd ymm0,QWORD PTR [rip+0x148]        # 1270 <avx2k_log_pd+0x180>
-    1126:	00 00 
-    1128:	c4 62 7d 19 15 40 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x140]        # 1271 <avx2k_log_pd+0x181>
-    112f:	00 00 
-    1131:	c4 e2 7d 19 35 28 01 	vbroadcastsd ymm6,QWORD PTR [rip+0x128]        # 1262 <avx2k_log_pd+0x172>
-    1138:	00 00 
-    113a:	c4 62 7d 19 0d 80 01 	vbroadcastsd ymm9,QWORD PTR [rip+0x180]        # 12c3 <avx2k_log_pd+0x1d3>
-    1141:	00 00 
-    1143:	c5 fd 10 0a          	vmovupd ymm1,YMMWORD PTR [rdx]
-    1147:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
-    114b:	c4 41 75 c2 d2 11    	vcmplt_oqpd ymm10,ymm1,ymm10
-    1151:	c5 f5 c2 fe 00       	vcmpeqpd ymm7,ymm1,ymm6
-    1156:	c5 75 c2 c1 03       	vcmpunordpd ymm8,ymm1,ymm1
-    115b:	c5 f5 c2 dc 11       	vcmplt_oqpd ymm3,ymm1,ymm4
-    1160:	c5 f5 c2 e4 00       	vcmpeqpd ymm4,ymm1,ymm4
-    1165:	48 89 c8             	mov    rax,rcx
-    1168:	c4 41 2d 54 c9       	vandpd ymm9,ymm10,ymm9
-    116d:	c4 e3 75 4b c8 a0    	vblendvpd ymm1,ymm1,ymm0,ymm10
-    1173:	c4 e2 55 37 db       	vpcmpgtq ymm3,ymm5,ymm3
-    1178:	c4 e2 7d 59 05 10 02 	vpbroadcastq ymm0,QWORD PTR [rip+0x210]        # 1391 <avx2k_log_pd+0x2a1>
-    117f:	00 00 
-    1181:	c4 62 7d 19 15 90 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x190]        # 131a <avx2k_log_pd+0x22a>
-    1188:	00 00 
-    118a:	c5 ed 73 d1 34       	vpsrlq ymm2,ymm1,0x34
-    118f:	c4 c2 55 37 e8       	vpcmpgtq ymm5,ymm5,ymm8
-    1194:	c5 ed db d0          	vpand  ymm2,ymm2,ymm0
-    1198:	c4 e2 7d 19 05 50 01 	vbroadcastsd ymm0,QWORD PTR [rip+0x150]        # 12f1 <avx2k_log_pd+0x201>
-    119f:	00 00 
-    11a1:	c5 f5 54 c8          	vandpd ymm1,ymm1,ymm0
-    11a5:	c5 f9 6f c2          	vmovdqa xmm0,xmm2
-    11a9:	c4 e3 7d 39 d2 01    	vextracti128 xmm2,ymm2,0x1
-    11af:	c5 f5 eb 0d 60 01 00 	vpor   ymm1,ymm1,YMMWORD PTR [rip+0x160]        # 1317 <avx2k_log_pd+0x227>
-    11b6:	00 
-    11b7:	c5 f8 c6 c2 88       	vshufps xmm0,xmm0,xmm2,0x88
-    11bc:	c5 fe e6 c0          	vcvtdq2pd ymm0,xmm0
-    11c0:	c4 e2 7d 19 15 88 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x188]        # 1351 <avx2k_log_pd+0x261>
+0000000000001150 <avx2k_gelu_ps>:
+    1150:	48 83 ec 58          	sub    rsp,0x58
+    1154:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+    1159:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
+    115f:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
+    1165:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
+    116b:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
+    1171:	c4 e2 7d 18 25 2c 00 	vbroadcastss ymm4,DWORD PTR [rip+0x2c]        # 11a6 <avx2k_gelu_ps+0x56>
+    1178:	00 00 
+    117a:	c4 e2 7d 18 0d c8 00 	vbroadcastss ymm1,DWORD PTR [rip+0xc8]        # 124b <avx2k_gelu_ps+0xfb>
+    1181:	00 00 
+    1183:	c4 e2 7d 18 2d 5c 00 	vbroadcastss ymm5,DWORD PTR [rip+0x5c]        # 11e8 <avx2k_gelu_ps+0x98>
+    118a:	00 00 
+    118c:	c4 e2 7d 18 15 2c 01 	vbroadcastss ymm2,DWORD PTR [rip+0x12c]        # 12c1 <avx2k_gelu_ps+0x171>
+    1193:	00 00 
+    1195:	c4 e2 7d 18 3d 00 00 	vbroadcastss ymm7,DWORD PTR [rip+0x0]        # 119e <avx2k_gelu_ps+0x4e>
+    119c:	00 00 
+    119e:	c5 fc 10 1a          	vmovups ymm3,YMMWORD PTR [rdx]
+    11a2:	c4 62 7d 18 05 0c 00 	vbroadcastss ymm8,DWORD PTR [rip+0xc]        # 11b7 <avx2k_gelu_ps+0x67>
+    11a9:	00 00 
+    11ab:	c4 62 7d 18 0d 10 00 	vbroadcastss ymm9,DWORD PTR [rip+0x10]        # 11c4 <avx2k_gelu_ps+0x74>
+    11b2:	00 00 
+    11b4:	c5 e4 59 c3          	vmulps ymm0,ymm3,ymm3
+    11b8:	48 89 c8             	mov    rax,rcx
+    11bb:	c4 e2 5d 98 c8       	vfmadd132ps ymm1,ymm4,ymm0
+    11c0:	c4 e2 7d 18 05 cc 00 	vbroadcastss ymm0,DWORD PTR [rip+0xcc]        # 1295 <avx2k_gelu_ps+0x145>
     11c7:	00 00 
-    11c9:	c5 e5 eb dd          	vpor   ymm3,ymm3,ymm5
-    11cd:	c5 f5 c2 d2 11       	vcmplt_oqpd ymm2,ymm1,ymm2
-    11d2:	c5 6d 54 d9          	vandpd ymm11,ymm2,ymm1
-    11d6:	c5 ad 58 c9          	vaddpd ymm1,ymm10,ymm1
-    11da:	c4 62 7d 19 15 00 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x100]        # 12e3 <avx2k_log_pd+0x1f3>
-    11e1:	00 00 
-    11e3:	c4 c1 6d 54 d2       	vandpd ymm2,ymm2,ymm10
-    11e8:	c4 62 7d 19 15 98 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x198]        # 1389 <avx2k_log_pd+0x299>
-    11ef:	00 00 
-    11f1:	c4 c1 75 58 cb       	vaddpd ymm1,ymm1,ymm11
-    11f6:	c4 62 7d 19 1d d8 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1d8]        # 13d7 <avx2k_log_pd+0x2e7>
-    11fd:	00 00 
-    11ff:	c4 c1 7d 58 c2       	vaddpd ymm0,ymm0,ymm10
-    1204:	c4 62 7d 19 15 a8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1a8]        # 13b5 <avx2k_log_pd+0x2c5>
-    120b:	00 00 
-    120d:	c4 c1 7d 5c c1       	vsubpd ymm0,ymm0,ymm9
-    1212:	c5 75 59 c9          	vmulpd ymm9,ymm1,ymm1
-    1216:	c5 fd 5c c2          	vsubpd ymm0,ymm0,ymm2
-    121a:	c4 e2 7d 19 15 a0 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x1a0]        # 13c3 <avx2k_log_pd+0x2d3>
-    1221:	00 00 
-    1223:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
-    1228:	c4 62 7d 19 15 b0 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1b0]        # 13e1 <avx2k_log_pd+0x2f1>
-    122f:	00 00 
-    1231:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
-    1236:	c4 62 7d 19 15 b8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1b8]        # 13f7 <avx2k_log_pd+0x307>
-    123d:	00 00 
-    123f:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
-    1244:	c4 62 7d 19 15 c0 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1c0]        # 140d <avx2k_log_pd+0x31d>
-    124b:	00 00 
-    124d:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
-    1252:	c4 62 7d 19 15 c8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1c8]        # 1423 <avx2k_log_pd+0x333>
-    1259:	00 00 
-    125b:	c4 62 ed b8 d1       	vfmadd231pd ymm10,ymm2,ymm1
-    1260:	c4 e2 7d 19 15 d0 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x1d0]        # 1439 <avx2k_log_pd+0x349>
-    1267:	00 00 
-    1269:	c5 f5 58 d2          	vaddpd ymm2,ymm1,ymm2
-    126d:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
-    1272:	c4 62 7d 19 1d e0 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1e0]        # 145b <avx2k_log_pd+0x36b>
-    1279:	00 00 
-    127b:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
-    1280:	c4 62 7d 19 1d e8 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1e8]        # 1471 <avx2k_log_pd+0x381>
-    1287:	00 00 
-    1289:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
-    128e:	c4 62 7d 19 1d f0 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1f0]        # 1487 <avx2k_log_pd+0x397>
-    1295:	00 00 
-    1297:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
-    129c:	c5 ad 5e d2          	vdivpd ymm2,ymm10,ymm2
-    12a0:	c4 62 7d 19 15 f8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1f8]        # 14a1 <avx2k_log_pd+0x3b1>
-    12a7:	00 00 
-    12a9:	c4 c1 6d 59 d1       	vmulpd ymm2,ymm2,ymm9
-    12ae:	c5 ed 59 d1          	vmulpd ymm2,ymm2,ymm1
-    12b2:	c4 c2 fd b8 d2       	vfmadd231pd ymm2,ymm0,ymm10
-    12b7:	c4 62 7d 19 15 60 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x160]        # 1420 <avx2k_log_pd+0x330>
+    11c9:	c5 e4 59 c9          	vmulps ymm1,ymm3,ymm1
+    11cd:	c5 f4 59 c8          	vmulps ymm1,ymm1,ymm0
+    11d1:	c5 f8 57 c0          	vxorps xmm0,xmm0,xmm0
+    11d5:	c5 d4 55 f1          	vandnps ymm6,ymm5,ymm1
+    11d9:	c5 d4 54 e9          	vandps ymm5,ymm5,ymm1
+    11dd:	c4 e2 4d bc c2       	vfnmadd231ps ymm0,ymm6,ymm2
+    11e2:	c5 fc 5d c7          	vminps ymm0,ymm0,ymm7
+    11e6:	c4 e2 7d 18 3d 04 00 	vbroadcastss ymm7,DWORD PTR [rip+0x4]        # 11f3 <avx2k_gelu_ps+0xa3>
+    11ed:	00 00 
+    11ef:	c5 fc 5f c7          	vmaxps ymm0,ymm0,ymm7
+    11f3:	c4 e2 7d 18 3d 08 00 	vbroadcastss ymm7,DWORD PTR [rip+0x8]        # 1204 <avx2k_gelu_ps+0xb4>
+    11fa:	00 00 
+    11fc:	c5 fc 59 ff          	vmulps ymm7,ymm0,ymm7
+    1200:	c4 e3 7d 08 ff 08    	vroundps ymm7,ymm7,0x8
+    1206:	c4 c2 45 bc c0       	vfnmadd231ps ymm0,ymm7,ymm8
+    120b:	c4 62 7d 18 05 18 00 	vbroadcastss ymm8,DWORD PTR [rip+0x18]        # 122c <avx2k_gelu_ps+0xdc>
+    1212:	00 00 
+    1214:	c4 62 7d 9c cf       	vfnmadd132ps ymm9,ymm0,ymm7
+    1219:	c5 fe 5b ff          	vcvttps2dq ymm7,ymm7
+    121d:	c4 e2 7d 18 05 14 00 	vbroadcastss ymm0,DWORD PTR [rip+0x14]        # 123a <avx2k_gelu_ps+0xea>
+    1224:	00 00 
+    1226:	c4 41 34 59 d1       	vmulps ymm10,ymm9,ymm9
+    122b:	c4 c2 3d 98 c1       	vfmadd132ps ymm0,ymm8,ymm9
+    1230:	c4 62 7d 18 05 1c 00 	vbroadcastss ymm8,DWORD PTR [rip+0x1c]        # 1255 <avx2k_gelu_ps+0x105>
+    1237:	00 00 
+    1239:	c4 c2 3d 98 c1       	vfmadd132ps ymm0,ymm8,ymm9
+    123e:	c4 62 7d 18 05 20 00 	vbroadcastss ymm8,DWORD PTR [rip+0x20]        # 1267 <avx2k_gelu_ps+0x117>
+    1245:	00 00 
+    1247:	c4 c2 3d 98 c1       	vfmadd132ps ymm0,ymm8,ymm9
+    124c:	c4 62 7d 18 05 24 00 	vbroadcastss ymm8,DWORD PTR [rip+0x24]        # 1279 <avx2k_gelu_ps+0x129>
+    1253:	00 00 
+    1255:	c4 c2 3d 98 c1       	vfmadd132ps ymm0,ymm8,ymm9
+    125a:	c4 62 7d 18 05 28 00 	vbroadcastss ymm8,DWORD PTR [rip+0x28]        # 128b <avx2k_gelu_ps+0x13b>
+    1261:	00 00 
+    1263:	c4 c1 64 59 d8       	vmulps ymm3,ymm3,ymm8
+    1268:	c4 c2 3d 98 c1       	vfmadd132ps ymm0,ymm8,ymm9
+    126d:	c4 c2 35 98 c2       	vfmadd132ps ymm0,ymm9,ymm10
+    1272:	c4 41 35 76 c9       	vpcmpeqd ymm9,ymm9,ymm9
+    1277:	c4 c1 35 72 d1 19    	vpsrld ymm9,ymm9,0x19
+    127d:	c4 c1 45 fe f9       	vpaddd ymm7,ymm7,ymm9
+    1282:	c4 62 7d 18 0d b0 00 	vbroadcastss ymm9,DWORD PTR [rip+0xb0]        # 133b <avx2k_gelu_ps+0x1eb>
+    1289:	00 00 
+    128b:	c5 c5 72 f7 17       	vpslld ymm7,ymm7,0x17
+    1290:	c5 fc 58 c4          	vaddps ymm0,ymm0,ymm4
+    1294:	c5 fc 59 c7          	vmulps ymm0,ymm0,ymm7
+    1298:	c5 fc 58 fc          	vaddps ymm7,ymm0,ymm4
+    129c:	c5 fc 5e c7          	vdivps ymm0,ymm0,ymm7
+    12a0:	c5 f4 59 f9          	vmulps ymm7,ymm1,ymm1
+    12a4:	c4 e2 5d 9c d0       	vfnmadd132ps ymm2,ymm4,ymm0
+    12a9:	c4 e2 7d 18 05 ac 00 	vbroadcastss ymm0,DWORD PTR [rip+0xac]        # 135e <avx2k_pow_ps+0x1e>
+    12b0:	00 00 
+    12b2:	c4 e2 35 98 c7       	vfmadd132ps ymm0,ymm9,ymm7
+    12b7:	c4 62 7d 18 0d b4 00 	vbroadcastss ymm9,DWORD PTR [rip+0xb4]        # 1374 <avx2k_pow_ps+0x34>
     12be:	00 00 
-    12c0:	c4 42 ed 9c ca       	vfnmadd132pd ymm9,ymm2,ymm10
-    12c5:	c4 e2 7d 19 15 00 02 	vbroadcastsd ymm2,QWORD PTR [rip+0x200]        # 14ce <avx2k_log_pd+0x3de>
-    12cc:	00 00 
-    12ce:	c4 c1 75 58 c9       	vaddpd ymm1,ymm1,ymm9
-    12d3:	c4 e2 f5 98 c2       	vfmadd132pd ymm0,ymm1,ymm2
-    12d8:	c4 e2 7d 19 0d 08 02 	vbroadcastsd ymm1,QWORD PTR [rip+0x208]        # 14e9 <avx2k_log_pd+0x3f9>
-    12df:	00 00 
-    12e1:	c4 e3 7d 4b c6 70    	vblendvpd ymm0,ymm0,ymm6,ymm7
-    12e7:	c4 e3 7d 4b c1 40    	vblendvpd ymm0,ymm0,ymm1,ymm4
-    12ed:	c4 e2 7d 19 0d 30 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x130]        # 1426 <avx2k_log_pd+0x336>
-    12f4:	00 00 
-    12f6:	c4 e3 7d 4b c1 30    	vblendvpd ymm0,ymm0,ymm1,ymm3
-    12fc:	c5 fd 11 01          	vmovupd YMMWORD PTR [rcx],ymm0
-    1300:	c5 f8 77             	vzeroupper
-    1303:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
-    1308:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
-    130e:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
-    1314:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
-    131a:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
-    1320:	c5 78 10 5c 24 50    	vmovups xmm11,XMMWORD PTR [rsp+0x50]
-    1326:	48 83 c4 68          	add    rsp,0x68
-    132a:	c3                   	ret
-    132b:	90                   	nop
-    132c:	90                   	nop
-    132d:	90                   	nop
-    132e:	90                   	nop
-    132f:	90                   	nop
+    12c0:	c5 ec 56 d5          	vorps  ymm2,ymm2,ymm5
+    12c4:	c4 e2 35 98 c7       	vfmadd132ps ymm0,ymm9,ymm7
+    12c9:	c4 62 7d 18 0d b8 00 	vbroadcastss ymm9,DWORD PTR [rip+0xb8]        # 138a <avx2k_pow_ps+0x4a>
+    12d0:	00 00 
+    12d2:	c4 e2 35 98 c7       	vfmadd132ps ymm0,ymm9,ymm7
+    12d7:	c4 62 7d 18 0d bc 00 	vbroadcastss ymm9,DWORD PTR [rip+0xbc]        # 139c <avx2k_pow_ps+0x5c>
+    12de:	00 00 
+    12e0:	c4 e2 35 98 c7       	vfmadd132ps ymm0,ymm9,ymm7
+    12e5:	c5 c4 59 f8          	vmulps ymm7,ymm7,ymm0
+    12e9:	c4 e2 7d 18 05 c0 00 	vbroadcastss ymm0,DWORD PTR [rip+0xc0]        # 13b2 <avx2k_pow_ps+0x72>
+    12f0:	00 00 
+    12f2:	c5 cc c2 f0 01       	vcmpltps ymm6,ymm6,ymm0
+    12f7:	c4 e2 75 98 cf       	vfmadd132ps ymm1,ymm1,ymm7
+    12fc:	c5 f4 56 cd          	vorps  ymm1,ymm1,ymm5
+    1300:	c4 e3 6d 4a d1 60    	vblendvps ymm2,ymm2,ymm1,ymm6
+    1306:	c5 ec 58 d4          	vaddps ymm2,ymm2,ymm4
+    130a:	c5 ec 59 db          	vmulps ymm3,ymm2,ymm3
+    130e:	c5 fc 11 19          	vmovups YMMWORD PTR [rcx],ymm3
+    1312:	c5 f8 77             	vzeroupper
+    1315:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+    131a:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
+    1320:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
+    1326:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
+    132c:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
+    1332:	48 83 c4 58          	add    rsp,0x58
+    1336:	c3                   	ret
+    1337:	66 0f 1f 84 00 00 00 	nop    WORD PTR [rax+rax*1+0x0]
+    133e:	00 00 
+
+0000000000001340 <avx2k_pow_ps>:
+    1340:	48 83 ec 68          	sub    rsp,0x68
+    1344:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+    1349:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
+    134f:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
+    1355:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
+    135b:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
+    1361:	c5 78 11 5c 24 50    	vmovups XMMWORD PTR [rsp+0x50],xmm11
+    1367:	c5 d0 57 ed          	vxorps xmm5,xmm5,xmm5
+    136b:	c4 e2 7d 18 05 6c 00 	vbroadcastss ymm0,DWORD PTR [rip+0x6c]        # 13e0 <avx2k_pow_ps+0xa0>
+    1372:	00 00 
+    1374:	c4 e2 7d 18 0d 70 00 	vbroadcastss ymm1,DWORD PTR [rip+0x70]        # 13ed <avx2k_pow_ps+0xad>
+    137b:	00 00 
+    137d:	c4 e2 7d 18 35 28 00 	vbroadcastss ymm6,DWORD PTR [rip+0x28]        # 13ae <avx2k_pow_ps+0x6e>
+    1384:	00 00 
+    1386:	c4 62 7d 18 0d 74 00 	vbroadcastss ymm9,DWORD PTR [rip+0x74]        # 1403 <avx2k_pow_ps+0xc3>
+    138d:	00 00 
+    138f:	c5 fc 10 12          	vmovups ymm2,YMMWORD PTR [rdx]
+    1393:	ba 81 ff ff ff       	mov    edx,0xffffff81
+    1398:	c4 62 7d 18 15 58 00 	vbroadcastss ymm10,DWORD PTR [rip+0x58]        # 13f9 <avx2k_pow_ps+0xb9>
+    139f:	00 00 
+    13a1:	c4 62 7d 18 1d 7c 00 	vbroadcastss ymm11,DWORD PTR [rip+0x7c]        # 1426 <avx2k_pow_ps+0xe6>
+    13a8:	00 00 
+    13aa:	c4 c1 7c 10 18       	vmovups ymm3,YMMWORD PTR [r8]
+    13af:	c5 ec 5f c0          	vmaxps ymm0,ymm2,ymm0
+    13b3:	c5 6c c2 c5 02       	vcmpleps ymm8,ymm2,ymm5
+    13b8:	c4 e2 7d 18 25 2c 00 	vbroadcastss ymm4,DWORD PTR [rip+0x2c]        # 13ed <avx2k_pow_ps+0xad>
+    13bf:	00 00 
+    13c1:	48 89 c8             	mov    rax,rcx
+    13c4:	c5 c5 72 d0 17       	vpsrld ymm7,ymm0,0x17
+    13c9:	c5 fc 54 c1          	vandps ymm0,ymm0,ymm1
+    13cd:	c5 f9 6e ca          	vmovd  xmm1,edx
+    13d1:	c5 fc 56 c6          	vorps  ymm0,ymm0,ymm6
+    13d5:	c4 e2 7d 58 c9       	vpbroadcastd ymm1,xmm1
+    13da:	c4 41 7c c2 c9 01    	vcmpltps ymm9,ymm0,ymm9
+    13e0:	c5 c5 fe f9          	vpaddd ymm7,ymm7,ymm1
+    13e4:	c5 fc 5b ff          	vcvtdq2ps ymm7,ymm7
+    13e8:	c5 c4 58 fc          	vaddps ymm7,ymm7,ymm4
+    13ec:	c4 c1 7c 54 c9       	vandps ymm1,ymm0,ymm9
+    13f1:	c4 c1 7c 58 c2       	vaddps ymm0,ymm0,ymm10
+    13f6:	c4 41 5c 54 c9       	vandps ymm9,ymm4,ymm9
+    13fb:	c4 c1 44 5c f9       	vsubps ymm7,ymm7,ymm9
+    1400:	c5 64 c2 cd 01       	vcmpltps ymm9,ymm3,ymm5
+    1405:	c5 fc 58 c1          	vaddps ymm0,ymm0,ymm1
+    1409:	c4 e2 7d 18 0d 78 00 	vbroadcastss ymm1,DWORD PTR [rip+0x78]        # 148a <avx2k_pow_ps+0x14a>
+    1410:	00 00 
+    1412:	c5 7c 59 d0          	vmulps ymm10,ymm0,ymm0
+    1416:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    141b:	c4 62 7d 18 1d 80 00 	vbroadcastss ymm11,DWORD PTR [rip+0x80]        # 14a4 <avx2k_pow_ps+0x164>
+    1422:	00 00 
+    1424:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    1429:	c4 62 7d 18 1d 84 00 	vbroadcastss ymm11,DWORD PTR [rip+0x84]        # 14b6 <avx2k_pow_ps+0x176>
+    1430:	00 00 
+    1432:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    1437:	c4 62 7d 18 1d 88 00 	vbroadcastss ymm11,DWORD PTR [rip+0x88]        # 14c8 <avx2k_pow_ps+0x188>
+    143e:	00 00 
+    1440:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    1445:	c4 62 7d 18 1d 8c 00 	vbroadcastss ymm11,DWORD PTR [rip+0x8c]        # 14da <avx2k_pow_ps+0x19a>
+    144c:	00 00 
+    144e:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    1453:	c4 62 7d 18 1d 90 00 	vbroadcastss ymm11,DWORD PTR [rip+0x90]        # 14ec <avx2k_pow_ps+0x1ac>
+    145a:	00 00 
+    145c:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    1461:	c4 62 7d 18 1d 94 00 	vbroadcastss ymm11,DWORD PTR [rip+0x94]        # 14fe <avx2k_pow_ps+0x1be>
+    1468:	00 00 
+    146a:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    146f:	c4 62 7d 18 1d 98 00 	vbroadcastss ymm11,DWORD PTR [rip+0x98]        # 1510 <avx2k_pow_ps+0x1d0>
+    1476:	00 00 
+    1478:	c4 e2 25 98 c8       	vfmadd132ps ymm1,ymm11,ymm0
+    147d:	c5 fc 59 c9          	vmulps ymm1,ymm0,ymm1
+    1481:	c4 c1 74 59 ca       	vmulps ymm1,ymm1,ymm10
+    1486:	c4 62 75 9c d6       	vfnmadd132ps ymm10,ymm1,ymm6
+    148b:	c4 e2 7d 18 0d 08 00 	vbroadcastss ymm1,DWORD PTR [rip+0x8]        # 149c <avx2k_pow_ps+0x15c>
+    1492:	00 00 
+    1494:	c4 c1 7c 58 c2       	vaddps ymm0,ymm0,ymm10
+    1499:	c5 64 c2 d3 03       	vcmpunordps ymm10,ymm3,ymm3
+    149e:	c4 e2 45 98 c1       	vfmadd132ps ymm0,ymm7,ymm1
+    14a3:	c4 e2 7d 18 0d 30 00 	vbroadcastss ymm1,DWORD PTR [rip+0x30]        # 14dc <avx2k_pow_ps+0x19c>
+    14aa:	00 00 
+    14ac:	c4 c1 7c 56 c0       	vorps  ymm0,ymm0,ymm8
+    14b1:	c4 62 7d 18 05 18 00 	vbroadcastss ymm8,DWORD PTR [rip+0x18]        # 14d2 <avx2k_pow_ps+0x192>
+    14b8:	00 00 
+    14ba:	c5 e4 59 c0          	vmulps ymm0,ymm3,ymm0
+    14be:	c5 e4 c2 dd 00       	vcmpeqps ymm3,ymm3,ymm5
+    14c3:	c5 fc 5d c1          	vminps ymm0,ymm0,ymm1
+    14c7:	c4 e2 7d 18 0d 34 00 	vbroadcastss ymm1,DWORD PTR [rip+0x34]        # 1504 <avx2k_pow_ps+0x1c4>
+    14ce:	00 00 
+    14d0:	c5 fc 5f c1          	vmaxps ymm0,ymm0,ymm1
+    14d4:	c4 e2 7d 18 0d 38 00 	vbroadcastss ymm1,DWORD PTR [rip+0x38]        # 1515 <avx2k_pow_ps+0x1d5>
+    14db:	00 00 
+    14dd:	c4 e3 7d 08 f8 08    	vroundps ymm7,ymm0,0x8
+    14e3:	c5 fc 5c c7          	vsubps ymm0,ymm0,ymm7
+    14e7:	c5 fe 5b ff          	vcvttps2dq ymm7,ymm7
+    14eb:	c5 fc 59 c1          	vmulps ymm0,ymm0,ymm1
+    14ef:	c4 e2 7d 18 0d 14 00 	vbroadcastss ymm1,DWORD PTR [rip+0x14]        # 150c <avx2k_pow_ps+0x1cc>
+    14f6:	00 00 
+    14f8:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
+    14fd:	c4 62 7d 18 05 1c 00 	vbroadcastss ymm8,DWORD PTR [rip+0x1c]        # 1522 <avx2k_pow_ps+0x1e2>
+    1504:	00 00 
+    1506:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
+    150b:	c4 62 7d 18 05 20 00 	vbroadcastss ymm8,DWORD PTR [rip+0x20]        # 1534 <avx2k_pow_ps+0x1f4>
+    1512:	00 00 
+    1514:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
+    1519:	c4 62 7d 18 05 24 00 	vbroadcastss ymm8,DWORD PTR [rip+0x24]        # 1546 <avx2k_pow_ps+0x206>
+    1520:	00 00 
+    1522:	c4 e2 3d 98 c8       	vfmadd132ps ymm1,ymm8,ymm0
+    1527:	c5 6c c2 c5 00       	vcmpeqps ymm8,ymm2,ymm5
+    152c:	c4 e2 4d 98 c8       	vfmadd132ps ymm1,ymm6,ymm0
+    1531:	c5 fc 59 f0          	vmulps ymm6,ymm0,ymm0
+    1535:	c4 e2 75 b8 c6       	vfmadd231ps ymm0,ymm1,ymm6
+    153a:	c5 ec c2 f5 01       	vcmpltps ymm6,ymm2,ymm5
+    153f:	c5 f5 76 c9          	vpcmpeqd ymm1,ymm1,ymm1
+    1543:	c5 f5 72 d1 19       	vpsrld ymm1,ymm1,0x19
+    1548:	c5 c5 fe f9          	vpaddd ymm7,ymm7,ymm1
+    154c:	c5 f1 ef c9          	vpxor  xmm1,xmm1,xmm1
+    1550:	c5 c5 72 f7 17       	vpslld ymm7,ymm7,0x17
+    1555:	c5 f5 66 db          	vpcmpgtd ymm3,ymm1,ymm3
+    1559:	c5 fc 58 c4          	vaddps ymm0,ymm0,ymm4
+    155d:	c5 fc 59 c7          	vmulps ymm0,ymm0,ymm7
+    1561:	c4 e2 7d 18 3d a8 00 	vbroadcastss ymm7,DWORD PTR [rip+0xa8]        # 1612 <avx2k_exp_pd+0x32>
+    1568:	00 00 
+    156a:	c4 e3 7d 4a c7 60    	vblendvps ymm0,ymm0,ymm7,ymm6
+    1570:	c5 ec c2 f2 03       	vcmpunordps ymm6,ymm2,ymm2
+    1575:	c5 ec c2 d4 00       	vcmpeqps ymm2,ymm2,ymm4
+    157a:	c4 c1 4c 56 f2       	vorps  ymm6,ymm6,ymm10
+    157f:	c5 f5 66 d2          	vpcmpgtd ymm2,ymm1,ymm2
+    1583:	c4 c1 75 66 c9       	vpcmpgtd ymm1,ymm1,ymm9
+    1588:	c5 ed eb d3          	vpor   ymm2,ymm2,ymm3
+    158c:	c4 e2 7d 18 1d 68 00 	vbroadcastss ymm3,DWORD PTR [rip+0x68]        # 15fd <avx2k_exp_pd+0x1d>
+    1593:	00 00 
+    1595:	c5 e4 54 c9          	vandps ymm1,ymm3,ymm1
+    1599:	c4 e3 7d 4a c1 80    	vblendvps ymm0,ymm0,ymm1,ymm8
+    159f:	c4 e3 7d 4a c7 60    	vblendvps ymm0,ymm0,ymm7,ymm6
+    15a5:	c4 e3 7d 4a c4 20    	vblendvps ymm0,ymm0,ymm4,ymm2
+    15ab:	c5 fc 11 01          	vmovups YMMWORD PTR [rcx],ymm0
+    15af:	c5 f8 77             	vzeroupper
+    15b2:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+    15b7:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
+    15bd:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
+    15c3:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
+    15c9:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
+    15cf:	c5 78 10 5c 24 50    	vmovups xmm11,XMMWORD PTR [rsp+0x50]
+    15d5:	48 83 c4 68          	add    rsp,0x68
+    15d9:	c3                   	ret
+    15da:	66 0f 1f 44 00 00    	nop    WORD PTR [rax+rax*1+0x0]
+
+00000000000015e0 <avx2k_exp_pd>:
+    15e0:	48 83 ec 38          	sub    rsp,0x38
+    15e4:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+    15e9:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
+    15ef:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
+    15f5:	c4 e2 7d 19 15 d0 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xd0]        # 16ce <avx2k_exp_pd+0xee>
+    15fc:	00 00 
+    15fe:	c4 e2 7d 19 0d d8 00 	vbroadcastsd ymm1,QWORD PTR [rip+0xd8]        # 16df <avx2k_exp_pd+0xff>
+    1605:	00 00 
+    1607:	c4 e2 7d 19 35 00 01 	vbroadcastsd ymm6,QWORD PTR [rip+0x100]        # 1710 <avx2k_exp_pd+0x130>
+    160e:	00 00 
+    1610:	c4 62 7d 19 05 08 01 	vbroadcastsd ymm8,QWORD PTR [rip+0x108]        # 1721 <avx2k_exp_pd+0x141>
+    1617:	00 00 
+    1619:	c5 fd 10 02          	vmovupd ymm0,YMMWORD PTR [rdx]
+    161d:	c5 fd c2 ea 1e       	vcmpgt_oqpd ymm5,ymm0,ymm2
+    1622:	c5 fd c2 e1 11       	vcmplt_oqpd ymm4,ymm0,ymm1
+    1627:	c5 fd c2 d8 03       	vcmpunordpd ymm3,ymm0,ymm0
+    162c:	c5 fd 5d c2          	vminpd ymm0,ymm0,ymm2
+    1630:	c4 e2 7d 19 15 e8 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xe8]        # 1721 <avx2k_exp_pd+0x141>
+    1637:	00 00 
+    1639:	48 89 c8             	mov    rax,rcx
+    163c:	c5 fd 5f c9          	vmaxpd ymm1,ymm0,ymm1
+    1640:	c4 e2 7d 19 05 e0 00 	vbroadcastsd ymm0,QWORD PTR [rip+0xe0]        # 1729 <avx2k_exp_pd+0x149>
+    1647:	00 00 
+    1649:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
+    164d:	c4 e3 7d 09 c0 08    	vroundpd ymm0,ymm0,0x8
+    1653:	c4 e2 f5 9c d0       	vfnmadd132pd ymm2,ymm1,ymm0
+    1658:	c4 e2 7d 19 0d f0 00 	vbroadcastsd ymm1,QWORD PTR [rip+0xf0]        # 1751 <avx2k_log_pd+0x11>
+    165f:	00 00 
+    1661:	c4 e2 ed 9c c8       	vfnmadd132pd ymm1,ymm2,ymm0
+    1666:	c5 ff e6 c0          	vcvtpd2dq xmm0,ymm0
+    166a:	c4 e2 7d 19 15 f8 00 	vbroadcastsd ymm2,QWORD PTR [rip+0xf8]        # 176b <avx2k_log_pd+0x2b>
+    1671:	00 00 
+    1673:	c5 f5 59 f9          	vmulpd ymm7,ymm1,ymm1
+    1677:	c4 e2 cd 98 d7       	vfmadd132pd ymm2,ymm6,ymm7
+    167c:	c4 e2 7d 19 35 10 01 	vbroadcastsd ymm6,QWORD PTR [rip+0x110]        # 1795 <avx2k_log_pd+0x55>
+    1683:	00 00 
+    1685:	c4 e2 bd 98 d7       	vfmadd132pd ymm2,ymm8,ymm7
+    168a:	c5 f5 59 d2          	vmulpd ymm2,ymm1,ymm2
+    168e:	c4 e2 7d 19 0d 18 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x118]        # 17af <avx2k_log_pd+0x6f>
+    1695:	00 00 
+    1697:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
+    169c:	c4 e2 7d 19 0d 20 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x120]        # 17c5 <avx2k_log_pd+0x85>
+    16a3:	00 00 
+    16a5:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
+    16aa:	c4 e2 7d 19 0d 28 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x128]        # 17db <avx2k_log_pd+0x9b>
+    16b1:	00 00 
+    16b3:	c4 e2 f5 98 f7       	vfmadd132pd ymm6,ymm1,ymm7
+    16b8:	c4 e2 7d 59 3d 40 01 	vpbroadcastq ymm7,QWORD PTR [rip+0x140]        # 1801 <avx2k_log_pd+0xc1>
+    16bf:	00 00 
+    16c1:	c5 cd 5c f2          	vsubpd ymm6,ymm6,ymm2
+    16c5:	c5 ed 5e d6          	vdivpd ymm2,ymm2,ymm6
+    16c9:	c4 e2 bd 98 ca       	vfmadd132pd ymm1,ymm8,ymm2
+    16ce:	c5 e9 72 e0 01       	vpsrad xmm2,xmm0,0x1
+    16d3:	c4 e2 7d 25 f2       	vpmovsxdq ymm6,xmm2
+    16d8:	c5 f9 fa d2          	vpsubd xmm2,xmm0,xmm2
+    16dc:	c5 cd d4 c7          	vpaddq ymm0,ymm6,ymm7
+    16e0:	c4 e2 7d 25 d2       	vpmovsxdq ymm2,xmm2
+    16e5:	c5 fd 73 f0 34       	vpsllq ymm0,ymm0,0x34
+    16ea:	c5 ed d4 d7          	vpaddq ymm2,ymm2,ymm7
+    16ee:	c5 ed 73 f2 34       	vpsllq ymm2,ymm2,0x34
+    16f3:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
+    16f7:	c4 e2 7d 19 0d 30 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x130]        # 1830 <avx2k_log_pd+0xf0>
+    16fe:	00 00 
+    1700:	c5 fd 59 c2          	vmulpd ymm0,ymm0,ymm2
+    1704:	c4 e3 7d 4b c1 50    	vblendvpd ymm0,ymm0,ymm1,ymm5
+    170a:	c5 f1 57 c9          	vxorpd xmm1,xmm1,xmm1
+    170e:	c4 e3 7d 4b c1 40    	vblendvpd ymm0,ymm0,ymm1,ymm4
+    1714:	c4 e2 7d 19 0d 38 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x138]        # 1855 <avx2k_log_pd+0x115>
+    171b:	00 00 
+    171d:	c4 e3 7d 4b c1 30    	vblendvpd ymm0,ymm0,ymm1,ymm3
+    1723:	c5 fd 11 01          	vmovupd YMMWORD PTR [rcx],ymm0
+    1727:	c5 f8 77             	vzeroupper
+    172a:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+    172f:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
+    1735:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
+    173b:	48 83 c4 38          	add    rsp,0x38
+    173f:	c3                   	ret
+
+0000000000001740 <avx2k_log_pd>:
+    1740:	48 83 ec 68          	sub    rsp,0x68
+    1744:	c5 f8 11 34 24       	vmovups XMMWORD PTR [rsp],xmm6
+    1749:	c5 f8 11 7c 24 10    	vmovups XMMWORD PTR [rsp+0x10],xmm7
+    174f:	c5 78 11 44 24 20    	vmovups XMMWORD PTR [rsp+0x20],xmm8
+    1755:	c5 78 11 4c 24 30    	vmovups XMMWORD PTR [rsp+0x30],xmm9
+    175b:	c5 78 11 54 24 40    	vmovups XMMWORD PTR [rsp+0x40],xmm10
+    1761:	c5 78 11 5c 24 50    	vmovups XMMWORD PTR [rsp+0x50],xmm11
+    1767:	c5 d9 57 e4          	vxorpd xmm4,xmm4,xmm4
+    176b:	c5 d1 ef ed          	vpxor  xmm5,xmm5,xmm5
+    176f:	c4 e2 7d 19 05 50 01 	vbroadcastsd ymm0,QWORD PTR [rip+0x150]        # 18c8 <avx2k_log_pd+0x188>
+    1776:	00 00 
+    1778:	c4 62 7d 19 15 48 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x148]        # 18c9 <avx2k_log_pd+0x189>
+    177f:	00 00 
+    1781:	c4 e2 7d 19 35 30 01 	vbroadcastsd ymm6,QWORD PTR [rip+0x130]        # 18ba <avx2k_log_pd+0x17a>
+    1788:	00 00 
+    178a:	c4 62 7d 19 0d 80 01 	vbroadcastsd ymm9,QWORD PTR [rip+0x180]        # 1913 <avx2k_log_pd+0x1d3>
+    1791:	00 00 
+    1793:	c5 fd 10 0a          	vmovupd ymm1,YMMWORD PTR [rdx]
+    1797:	c5 f5 59 c0          	vmulpd ymm0,ymm1,ymm0
+    179b:	c4 41 75 c2 d2 11    	vcmplt_oqpd ymm10,ymm1,ymm10
+    17a1:	c5 f5 c2 fe 00       	vcmpeqpd ymm7,ymm1,ymm6
+    17a6:	c5 75 c2 c1 03       	vcmpunordpd ymm8,ymm1,ymm1
+    17ab:	c5 f5 c2 dc 11       	vcmplt_oqpd ymm3,ymm1,ymm4
+    17b0:	c5 f5 c2 e4 00       	vcmpeqpd ymm4,ymm1,ymm4
+    17b5:	48 89 c8             	mov    rax,rcx
+    17b8:	c4 41 2d 54 c9       	vandpd ymm9,ymm10,ymm9
+    17bd:	c4 e3 75 4b c8 a0    	vblendvpd ymm1,ymm1,ymm0,ymm10
+    17c3:	c4 e2 55 37 db       	vpcmpgtq ymm3,ymm5,ymm3
+    17c8:	c4 e2 7d 59 05 10 02 	vpbroadcastq ymm0,QWORD PTR [rip+0x210]        # 19e1 <avx2k_log_pd+0x2a1>
+    17cf:	00 00 
+    17d1:	c4 62 7d 19 15 90 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x190]        # 196a <avx2k_log_pd+0x22a>
+    17d8:	00 00 
+    17da:	c5 ed 73 d1 34       	vpsrlq ymm2,ymm1,0x34
+    17df:	c4 c2 55 37 e8       	vpcmpgtq ymm5,ymm5,ymm8
+    17e4:	c5 ed db d0          	vpand  ymm2,ymm2,ymm0
+    17e8:	c4 e2 7d 19 05 58 01 	vbroadcastsd ymm0,QWORD PTR [rip+0x158]        # 1949 <avx2k_log_pd+0x209>
+    17ef:	00 00 
+    17f1:	c5 f5 54 c8          	vandpd ymm1,ymm1,ymm0
+    17f5:	c5 f9 6f c2          	vmovdqa xmm0,xmm2
+    17f9:	c4 e3 7d 39 d2 01    	vextracti128 xmm2,ymm2,0x1
+    17ff:	c5 f5 eb 0d 60 01 00 	vpor   ymm1,ymm1,YMMWORD PTR [rip+0x160]        # 1967 <avx2k_log_pd+0x227>
+    1806:	00 
+    1807:	c5 f8 c6 c2 88       	vshufps xmm0,xmm0,xmm2,0x88
+    180c:	c5 fe e6 c0          	vcvtdq2pd ymm0,xmm0
+    1810:	c4 e2 7d 19 15 88 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x188]        # 19a1 <avx2k_log_pd+0x261>
+    1817:	00 00 
+    1819:	c5 e5 eb dd          	vpor   ymm3,ymm3,ymm5
+    181d:	c5 f5 c2 d2 11       	vcmplt_oqpd ymm2,ymm1,ymm2
+    1822:	c5 6d 54 d9          	vandpd ymm11,ymm2,ymm1
+    1826:	c5 ad 58 c9          	vaddpd ymm1,ymm10,ymm1
+    182a:	c4 62 7d 19 15 08 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x108]        # 193b <avx2k_log_pd+0x1fb>
+    1831:	00 00 
+    1833:	c4 c1 6d 54 d2       	vandpd ymm2,ymm2,ymm10
+    1838:	c4 62 7d 19 15 98 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x198]        # 19d9 <avx2k_log_pd+0x299>
+    183f:	00 00 
+    1841:	c4 c1 75 58 cb       	vaddpd ymm1,ymm1,ymm11
+    1846:	c4 62 7d 19 1d d8 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1d8]        # 1a27 <avx2k_log_pd+0x2e7>
+    184d:	00 00 
+    184f:	c4 c1 7d 58 c2       	vaddpd ymm0,ymm0,ymm10
+    1854:	c4 62 7d 19 15 a8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1a8]        # 1a05 <avx2k_log_pd+0x2c5>
+    185b:	00 00 
+    185d:	c4 c1 7d 5c c1       	vsubpd ymm0,ymm0,ymm9
+    1862:	c5 75 59 c9          	vmulpd ymm9,ymm1,ymm1
+    1866:	c5 fd 5c c2          	vsubpd ymm0,ymm0,ymm2
+    186a:	c4 e2 7d 19 15 a0 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x1a0]        # 1a13 <avx2k_log_pd+0x2d3>
+    1871:	00 00 
+    1873:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
+    1878:	c4 62 7d 19 15 b0 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1b0]        # 1a31 <avx2k_log_pd+0x2f1>
+    187f:	00 00 
+    1881:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
+    1886:	c4 62 7d 19 15 b8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1b8]        # 1a47 <avx2k_log_pd+0x307>
+    188d:	00 00 
+    188f:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
+    1894:	c4 62 7d 19 15 c0 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1c0]        # 1a5d <avx2k_log_pd+0x31d>
+    189b:	00 00 
+    189d:	c4 e2 ad 98 d1       	vfmadd132pd ymm2,ymm10,ymm1
+    18a2:	c4 62 7d 19 15 c8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1c8]        # 1a73 <avx2k_log_pd+0x333>
+    18a9:	00 00 
+    18ab:	c4 62 ed b8 d1       	vfmadd231pd ymm10,ymm2,ymm1
+    18b0:	c4 e2 7d 19 15 d0 01 	vbroadcastsd ymm2,QWORD PTR [rip+0x1d0]        # 1a89 <avx2k_log_pd+0x349>
+    18b7:	00 00 
+    18b9:	c5 f5 58 d2          	vaddpd ymm2,ymm1,ymm2
+    18bd:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
+    18c2:	c4 62 7d 19 1d e0 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1e0]        # 1aab <avx2k_log_pd+0x36b>
+    18c9:	00 00 
+    18cb:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
+    18d0:	c4 62 7d 19 1d e8 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1e8]        # 1ac1 <avx2k_log_pd+0x381>
+    18d7:	00 00 
+    18d9:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
+    18de:	c4 62 7d 19 1d f0 01 	vbroadcastsd ymm11,QWORD PTR [rip+0x1f0]        # 1ad7 <avx2k_log_pd+0x397>
+    18e5:	00 00 
+    18e7:	c4 e2 a5 98 d1       	vfmadd132pd ymm2,ymm11,ymm1
+    18ec:	c5 ad 5e d2          	vdivpd ymm2,ymm10,ymm2
+    18f0:	c4 62 7d 19 15 f8 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x1f8]        # 1af1 <avx2k_log_pd+0x3b1>
+    18f7:	00 00 
+    18f9:	c4 c1 6d 59 d1       	vmulpd ymm2,ymm2,ymm9
+    18fe:	c5 ed 59 d1          	vmulpd ymm2,ymm2,ymm1
+    1902:	c4 c2 fd b8 d2       	vfmadd231pd ymm2,ymm0,ymm10
+    1907:	c4 62 7d 19 15 60 01 	vbroadcastsd ymm10,QWORD PTR [rip+0x160]        # 1a70 <avx2k_log_pd+0x330>
+    190e:	00 00 
+    1910:	c4 42 ed 9c ca       	vfnmadd132pd ymm9,ymm2,ymm10
+    1915:	c4 e2 7d 19 15 00 02 	vbroadcastsd ymm2,QWORD PTR [rip+0x200]        # 1b1e <avx2k_log_pd+0x3de>
+    191c:	00 00 
+    191e:	c4 c1 75 58 c9       	vaddpd ymm1,ymm1,ymm9
+    1923:	c4 e2 f5 98 c2       	vfmadd132pd ymm0,ymm1,ymm2
+    1928:	c4 e2 7d 19 0d 08 02 	vbroadcastsd ymm1,QWORD PTR [rip+0x208]        # 1b39 <avx2k_log_pd+0x3f9>
+    192f:	00 00 
+    1931:	c4 e3 7d 4b c6 70    	vblendvpd ymm0,ymm0,ymm6,ymm7
+    1937:	c4 e3 7d 4b c1 40    	vblendvpd ymm0,ymm0,ymm1,ymm4
+    193d:	c4 e2 7d 19 0d 38 01 	vbroadcastsd ymm1,QWORD PTR [rip+0x138]        # 1a7e <avx2k_log_pd+0x33e>
+    1944:	00 00 
+    1946:	c4 e3 7d 4b c1 30    	vblendvpd ymm0,ymm0,ymm1,ymm3
+    194c:	c5 fd 11 01          	vmovupd YMMWORD PTR [rcx],ymm0
+    1950:	c5 f8 77             	vzeroupper
+    1953:	c5 f8 10 34 24       	vmovups xmm6,XMMWORD PTR [rsp]
+    1958:	c5 f8 10 7c 24 10    	vmovups xmm7,XMMWORD PTR [rsp+0x10]
+    195e:	c5 78 10 44 24 20    	vmovups xmm8,XMMWORD PTR [rsp+0x20]
+    1964:	c5 78 10 4c 24 30    	vmovups xmm9,XMMWORD PTR [rsp+0x30]
+    196a:	c5 78 10 54 24 40    	vmovups xmm10,XMMWORD PTR [rsp+0x40]
+    1970:	c5 78 10 5c 24 50    	vmovups xmm11,XMMWORD PTR [rsp+0x50]
+    1976:	48 83 c4 68          	add    rsp,0x68
+    197a:	c3                   	ret
+    197b:	90                   	nop
+    197c:	90                   	nop
+    197d:	90                   	nop
+    197e:	90                   	nop
+    197f:	90                   	nop

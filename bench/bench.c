@@ -28,6 +28,9 @@ SCALAR_F32(s_exp2,  exp2f)
 SCALAR_F32(s_log,   logf)
 SCALAR_F32(s_tanh,  tanhf)
 SCALAR_F32(s_expm1, expm1f)
+SCALAR_F32(s_cbrt,  cbrtf)
+static float rsqrtf(float x) { return 1.0f / sqrtf(x); }
+SCALAR_F32(s_rsqrt, rsqrtf)
 
 #define SCALAR_F64(NAME, FN) \
     static void NAME(const double *in, double *out, size_t n) \
@@ -96,9 +99,11 @@ int main(void)
     run_f32("f32 expm1", s_expm1, avx2_expm1_f32, fin, fout, &sink);
     run_f32("f32 tanh",  s_tanh,  avx2_tanh_f32,  fin, fout, &sink);
 
-    /* positive inputs for log */
+    /* positive inputs for log / roots */
     for (unsigned i = 0; i < N; ++i) fin[i] = (float)(1e-3 + 1e4 * ((double)i / (double)(N - 1)));
     run_f32("f32 log",   s_log,   avx2_log_f32,   fin, fout, &sink);
+    run_f32("f32 rsqrt", s_rsqrt, avx2_rsqrt_f32, fin, fout, &sink);
+    run_f32("f32 cbrt",  s_cbrt,  avx2_cbrt_f32,  fin, fout, &sink);
 
     /* f64 */
     run_f64("f64 exp",   s_exp_d, avx2_exp_f64,   din, dout, &sink);

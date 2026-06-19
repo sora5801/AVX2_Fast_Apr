@@ -22,8 +22,8 @@ avx2_log_f32(in, out, n);         // bulk array helper, any length
 |---|---|---|
 | **exp family** | `exp` `exp2` `exp10` `expm1` | `exp` |
 | **log family** | `log` `log2` `log10` `log1p` | `log` |
-| **power**      | `pow` | |
-| **activations**| `tanh` `sigmoid` | |
+| **power / roots** | `pow` `sqrt` `rsqrt` `cbrt` | |
+| **activations**| `tanh` `sigmoid` `softplus` `gelu` | |
 
 Each has a per-vector kernel (`avx2_exp_ps`, `avx2_exp_pd`, …) and a bulk array
 helper (`avx2_exp_f32`, `avx2_exp_f64`, …) that handles any length including a
@@ -42,13 +42,20 @@ the authoritative check; numbers below are its output):
 | `expm1` (f32) | **1** | | `log1p` (f32) | **2** |
 | `tanh` (f32)  | **1** | | `sigmoid` (f32)| **2** |
 | `exp` (f64)   | **2** | | `log` (f64)   | **2** |
+| `rsqrt` (f32) | **2** | | `sqrt` (f32)  | **0** |
+| `cbrt` (f32)  | **3** | | `softplus`(f32)| **3** |
 | `pow` (f32)   | ~ few ULP for moderate exponents (fast variant — see below) | | | |
+| `gelu` (f32)  | abs err ≤ 5e-4 vs exact erf-GELU (it *is* the tanh approximation, see below) | | | |
 
 `expm1` and `log1p` keep full accuracy near 0 (where naïve `exp(x)-1` /
-`log(1+x)` lose all significant digits to cancellation). `tanh`/`sigmoid` are
-overflow-safe and saturate cleanly. `pow` is the *fast* composition
-`2^(y·log2 x)`: a few ULP for moderate `|y·log2 x|`, degrading for very large
-products — use libm if you need correct rounding.
+`log(1+x)` lose all significant digits to cancellation). `tanh`/`sigmoid`/
+`softplus`/`gelu` are overflow-safe and saturate cleanly. `rsqrt` uses the
+hardware seed plus two Newton-Raphson steps; `cbrt` uses an exponent-bit-trick
+seed (integer `/3` via multiply-high) plus two Halley iterations. `pow` is the
+*fast* composition `2^(y·log2 x)`: a few ULP for moderate `|y·log2 x|`,
+degrading for very large products. `gelu` is the **tanh approximation** used by
+GPT/BERT — it differs from the exact erf-based GELU by ~5e-4 by construction.
+Use libm where you need correct rounding.
 
 ## Performance
 
@@ -60,9 +67,10 @@ Single-threaded, 4M elements × 20 reps, Intel Core i9-9900K, gcc 15.2
 | `exp` (f32)   |  214 Me/s | 1118 Me/s | **5.2×** |
 | `expm1` (f32) |  191 Me/s | 1023 Me/s | **5.4×** |
 | `log` (f32)   |  227 Me/s | 1234 Me/s | **5.4×** |
-| `tanh` (f32)  |   74 Me/s |  953 Me/s | **12.9×** |
-| `exp` (f64)   |  207 Me/s |  482 Me/s | **2.3×** |
-| `log` (f64)   |  196 Me/s |  424 Me/s | **2.2×** |
+| `tanh` (f32)  |   76 Me/s | 1076 Me/s | **14.2×** |
+| `cbrt` (f32)  |  102 Me/s | 1149 Me/s | **11.3×** |
+| `exp` (f64)   |  212 Me/s |  556 Me/s | **2.6×** |
+| `log` (f64)   |  219 Me/s |  493 Me/s | **2.3×** |
 
 (Speedups vary by CPU and compiler; run `make bench` to measure your own.)
 
@@ -94,9 +102,27 @@ Notable details:
   `cvtepi32_pd`). `exp_pd` splits `2^n` into two half-steps so the 11-bit
   exponent field never overflows across the full range.
 
+- `rsqrt` refines the `vrsqrtps` hardware seed with two Newton-Raphson steps;
+  `cbrt` seeds from an exponent bit-trick (integer `/3` done with a
+  multiply-high, since AVX2 has no integer divide) and refines with two
+  cubically-convergent Halley iterations.
+
 See the heavily-commented headers for the full derivations:
 [`avx2_math_f32.h`](include/avx2_math_f32.h),
 [`avx2_math_f64.h`](include/avx2_math_f64.h).
+
+## Studying the generated code
+
+The [`study/`](study/) directory contains the kernels lowered to the metal, so
+you can line up *C intrinsic → assembly → machine-code bytes*:
+
+- [`study/WALKTHROUGH.md`](study/WALKTHROUGH.md) — a hand-annotated,
+  instruction-by-instruction tour of `avx2_exp_ps` (start here).
+- `avx2_math.intel.s` / `avx2_math.att.s` — full assembly, both syntaxes.
+- `avx2_math.disasm.txt` — disassembly with the machine-code bytes per instruction.
+- `avx2_math.text.hex` — raw `.text` hex dump.
+
+Regenerate for your platform/compiler with `make asm` or `study/gen.ps1`.
 
 ## Building
 
@@ -129,12 +155,13 @@ of faulting with SIGILL.
 
 ```
 include/avx2_math.h        umbrella header (include just this)
-include/avx2_math_f32.h    single-precision kernels (exp/log/pow/tanh/...)
+include/avx2_math_f32.h    single-precision kernels (exp/log/pow/roots/activations)
 include/avx2_math_f64.h    double-precision kernels (exp/log)
 src/avx2_math.c            bulk array wrappers
 test/test_accuracy.c       ULP validation + special values vs libm
 bench/bench.c              throughput benchmark vs scalar libm
 examples/demo.c            usage tour
+study/                     assembly + machine-code artifacts (see study/README.md)
 .github/workflows/ci.yml   build + test on gcc & clang
 ```
 

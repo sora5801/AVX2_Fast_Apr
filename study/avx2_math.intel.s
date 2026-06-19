@@ -1002,6 +1002,518 @@ avx2k_sigmoid_ps:
 	ret	
 	.seh_endproc
 	.p2align 4
+	.globl	avx2k_rsqrt_ps
+	.def	avx2k_rsqrt_ps;	.scl	2;	.type	32;	.endef
+	.seh_proc	avx2k_rsqrt_ps
+avx2k_rsqrt_ps:
+	sub	rsp, 24	 #,
+	.seh_stackalloc	24
+	vmovups	XMMWORD PTR [rsp], xmm6	 #,
+	.seh_savexmm	xmm6, 0
+	.seh_endprologue
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vbroadcastss	ymm1, DWORD PTR .LC21[rip]	 # tmp123,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm4, DWORD PTR .LC104[rip]	 # tmp127,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_rsqrt_ps (__m256 x) { return avx2_rsqrt_ps(x); }
+	vmovups	ymm2, YMMWORD PTR [rdx]	 # x, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm1, ymm2, ymm1	 # _6, x, tmp123
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:985:   return (__m256) __builtin_ia32_rsqrtps256 ((__v8sf)__A);
+	vrsqrtps	ymm0, ymm2	 # tmp121, x
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_rsqrt_ps (__m256 x) { return avx2_rsqrt_ps(x); }
+	mov	rax, rcx	 # .result_ptr, .result_ptr
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm3, ymm0, ymm1	 # _7, tmp121, _6
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd132ps	ymm3, ymm4, ymm0	 # tmp124, tmp127, tmp121
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm0, ymm3	 # _9, tmp121, tmp124
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vxorps	xmm3, xmm3, xmm3	 # tmp133
+	vcmpps	ymm6, ymm2, ymm3, 0	 # tmp132, x, tmp133,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm1, ymm1, ymm0	 # _10, _6, _9
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd132ps	ymm1, ymm4, ymm0	 # tmp128, tmp127, _9
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vbroadcastss	ymm4, DWORD PTR .LC55[rip]	 # tmp136,
+	vcmpps	ymm5, ymm2, ymm4, 0	 # tmp134, x, tmp136,
+	vcmpps	ymm2, ymm2, ymm3, 1	 # tmp137, x, tmp133,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm0, ymm1	 # _12, _9, tmp128
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_rsqrt_ps (__m256 x) { return avx2_rsqrt_ps(x); }
+	vbroadcastss	ymm1, DWORD PTR .LC88[rip]	 # tmp156,
+	vblendvps	ymm0, ymm0, ymm4, ymm6	 # tmp147, _12, tmp136, tmp132
+	vblendvps	ymm0, ymm0, ymm3, ymm5	 # tmp143, tmp147, tmp133, tmp134
+	vblendvps	ymm0, ymm0, ymm1, ymm2	 # tmp139, tmp143, tmp156, tmp137
+	vmovups	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp139
+	vzeroupper
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_rsqrt_ps (__m256 x) { return avx2_rsqrt_ps(x); }
+	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
+	add	rsp, 24	 #,
+	ret	
+	.seh_endproc
+	.p2align 4
+	.globl	avx2k_sqrt_ps
+	.def	avx2k_sqrt_ps;	.scl	2;	.type	32;	.endef
+	.seh_proc	avx2k_sqrt_ps
+avx2k_sqrt_ps:
+	.seh_endprologue
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:997:   return (__m256) __builtin_ia32_sqrtps256 ((__v8sf)__A);
+	vsqrtps	ymm0, YMMWORD PTR [rdx]	 # tmp102, x
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:36: KW __m256 avx2k_sqrt_ps  (__m256 x) { return avx2_sqrt_ps(x); }
+	mov	rax, rcx	 # .result_ptr, .result_ptr
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:36: KW __m256 avx2k_sqrt_ps  (__m256 x) { return avx2_sqrt_ps(x); }
+	vmovups	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp102
+	vzeroupper
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:36: KW __m256 avx2k_sqrt_ps  (__m256 x) { return avx2_sqrt_ps(x); }
+	ret	
+	.seh_endproc
+	.p2align 4
+	.globl	avx2k_cbrt_ps
+	.def	avx2k_cbrt_ps;	.scl	2;	.type	32;	.endef
+	.seh_proc	avx2k_cbrt_ps
+avx2k_cbrt_ps:
+	sub	rsp, 24	 #,
+	.seh_stackalloc	24
+	vmovups	XMMWORD PTR [rsp], xmm6	 #,
+	.seh_savexmm	xmm6, 0
+	.seh_endprologue
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm1, DWORD PTR .LC48[rip]	 # tmp146,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:37: KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
+	vmovups	ymm3, YMMWORD PTR [rdx]	 # x, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:569:   return (__m256i)__builtin_ia32_pmuludq256 ((__v8si)__A, (__v8si)__B);
+	mov	edx, -1431655765	 # tmp153,
+	vmovd	xmm5, edx	 # tmp152, tmp153
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:121:   return (__m256i) ((__v8su)__A + (__v8su)__B);
+	mov	edx, 709967975	 # tmp166,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm4, ymm3, ymm1	 # tmp144, x, tmp146
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:170:   return (__m256) __builtin_ia32_andnps256 ((__v8sf)__A, (__v8sf)__B);
+	vandnps	ymm1, ymm1, ymm3	 # tmp147, tmp146, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:569:   return (__m256i)__builtin_ia32_pmuludq256 ((__v8si)__A, (__v8si)__B);
+	vpbroadcastd	ymm5, xmm5	 # tmp152, tmp152
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:789:   return (__m256i)__builtin_ia32_psrlqi256 ((__v4di)__A, __B);
+	vpsrlq	ymm2, ymm1, 32	 # tmp154, tmp147,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:569:   return (__m256i)__builtin_ia32_pmuludq256 ((__v8si)__A, (__v8si)__B);
+	vpmuludq	ymm0, ymm1, ymm5	 # tmp150, tmp147, tmp152
+	vpmuludq	ymm2, ymm2, ymm5	 # tmp155, tmp154, tmp152
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:37: KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
+	mov	rax, rcx	 # .result_ptr, .result_ptr
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm5, DWORD PTR .LC90[rip]	 # tmp170,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:789:   return (__m256i)__builtin_ia32_psrlqi256 ((__v4di)__A, __B);
+	vpsrlq	ymm0, ymm0, 33	 # tmp159, tmp150,
+	vpsrlq	ymm2, ymm2, 33	 # tmp160, tmp155,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:698:   return (__m256i)__builtin_ia32_psllqi256 ((__v4di)__A, __B);
+	vpsllq	ymm2, ymm2, 32	 # tmp161, tmp160,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:576:   return (__m256i) ((__v4du)__A | (__v4du)__B);
+	vpor	ymm0, ymm0, ymm2	 # _18, tmp159, tmp161
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:121:   return (__m256i) ((__v8su)__A + (__v8su)__B);
+	vmovd	xmm2, edx	 # tmp165, tmp166
+	vpbroadcastd	ymm2, xmm2	 # tmp165, tmp165
+	vpaddd	ymm0, ymm0, ymm2	 # _20, _18, tmp165
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vmovaps	ymm2, ymm5	 # tmp168, tmp170
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm6, ymm0, ymm0	 # _46, _20, _20
+	vmulps	ymm6, ymm6, ymm0	 # _45, _46, _20
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm2, ymm6, ymm1	 # tmp168, _45, tmp147
+	vfmadd132ps	ymm6, ymm1, ymm5	 # tmp171, tmp147, tmp170
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:227:   return (__m256) ((__v8sf)__A / (__v8sf)__B);
+	vdivps	ymm2, ymm2, ymm6	 # _51, tmp168, tmp171
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm2, ymm2, ymm0	 # _52, _51, _20
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vmovaps	ymm0, ymm5	 # tmp176, tmp170
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm6, ymm2, ymm2	 # _56, _52, _52
+	vmulps	ymm6, ymm6, ymm2	 # _57, _56, _52
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm5, ymm1, ymm6	 # tmp179, tmp147, _57
+	vfmadd132ps	ymm0, ymm6, ymm1	 # tmp176, _57, tmp147
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm6, ymm3, ymm3, 3	 # tmp193, x, x,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:227:   return (__m256) ((__v8sf)__A / (__v8sf)__B);
+	vdivps	ymm0, ymm0, ymm5	 # _60, tmp176, tmp179
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vxorps	xmm5, xmm5, xmm5	 # tmp186
+	vcmpps	ymm5, ymm1, ymm5, 0	 # tmp185, tmp147, tmp186,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm0, ymm2	 # _61, _60, _52
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vbroadcastss	ymm2, DWORD PTR .LC55[rip]	 # tmp189,
+	vcmpps	ymm1, ymm1, ymm2, 0	 # tmp187, tmp147, tmp189,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
+	vorps	ymm2, ymm2, ymm4	 # tmp190, tmp189, tmp144
+	vorps	ymm0, ymm0, ymm4	 # tmp184, _61, tmp144
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:37: KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
+	vblendvps	ymm0, ymm0, ymm4, ymm5	 # tmp202, tmp184, tmp144, tmp185
+	vblendvps	ymm0, ymm0, ymm2, ymm1	 # tmp198, tmp202, tmp190, tmp187
+	vblendvps	ymm0, ymm0, ymm3, ymm6	 # tmp194, tmp198, x, tmp193
+	vmovups	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp194
+	vzeroupper
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:37: KW __m256 avx2k_cbrt_ps  (__m256 x) { return avx2_cbrt_ps(x); }
+	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
+	add	rsp, 24	 #,
+	ret	
+	.seh_endproc
+	.p2align 4
+	.globl	avx2k_softplus_ps
+	.def	avx2k_softplus_ps;	.scl	2;	.type	32;	.endef
+	.seh_proc	avx2k_softplus_ps
+avx2k_softplus_ps:
+	sub	rsp, 136	 #,
+	.seh_stackalloc	136
+	vmovups	XMMWORD PTR [rsp], xmm6	 #,
+	.seh_savexmm	xmm6, 0
+	vmovups	XMMWORD PTR 16[rsp], xmm7	 #,
+	.seh_savexmm	xmm7, 16
+	vmovups	XMMWORD PTR 32[rsp], xmm8	 #,
+	.seh_savexmm	xmm8, 32
+	vmovups	XMMWORD PTR 48[rsp], xmm9	 #,
+	.seh_savexmm	xmm9, 48
+	vmovups	XMMWORD PTR 64[rsp], xmm10	 #,
+	.seh_savexmm	xmm10, 64
+	vmovups	XMMWORD PTR 80[rsp], xmm11	 #,
+	.seh_savexmm	xmm11, 80
+	vmovups	XMMWORD PTR 96[rsp], xmm12	 #,
+	.seh_savexmm	xmm12, 96
+	vmovups	XMMWORD PTR 112[rsp], xmm13	 #,
+	.seh_savexmm	xmm13, 112
+	.seh_endprologue
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vxorps	xmm7, xmm7, xmm7	 # tmp186
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:170:   return (__m256) __builtin_ia32_andnps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm0, DWORD PTR .LC48[rip]	 # tmp185,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vbroadcastss	ymm2, DWORD PTR .LC5[rip]	 # tmp208,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm12, DWORD PTR .LC7[rip]	 # tmp211,
+	vbroadcastss	ymm10, DWORD PTR .LC9[rip]	 # tmp214,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm3, DWORD PTR .LC13[rip]	 # tmp219,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
+	vmovups	ymm6, YMMWORD PTR [rdx]	 # x, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:817:   return (__m256i) ((__v8su)__A - (__v8su)__B);
+	mov	edx, -127	 # tmp265,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm11, DWORD PTR .LC21[rip]	 # tmp231,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vbroadcastss	ymm5, DWORD PTR .LC24[rip]	 # tmp242,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vcmpltps	ymm1, ymm7, ymm6	 #, tmp189, tmp186, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:170:   return (__m256) __builtin_ia32_andnps256 ((__v8sf)__A, (__v8sf)__B);
+	vandnps	ymm0, ymm0, ymm6	 # tmp183, tmp185, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vbroadcastss	ymm8, DWORD PTR .LC46[rip]	 # tmp278,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm13, DWORD PTR .LC66[rip]	 # tmp283,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vsubps	ymm0, ymm7, ymm0	 # _8, tmp186, tmp183
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
+	mov	rax, rcx	 # .result_ptr, .result_ptr
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm6, ymm6, ymm1	 # _7, x, tmp189
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:292:   return (__m256) __builtin_ia32_minps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm1, DWORD PTR .LC1[rip]	 # tmp192,
+	vminps	ymm0, ymm0, ymm1	 # _34, _8, tmp192
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm1, DWORD PTR .LC3[rip]	 # tmp199,
+	vmaxps	ymm0, ymm0, ymm1	 # _36, _34, tmp199
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm1, DWORD PTR .LC11[rip]	 # tmp217,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm2, ymm0, ymm2	 # _37, _36, tmp208
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:1010:   return (__m256) __builtin_ia32_roundps256 ((__v8sf)__V, __M);
+	vroundps	ymm2, ymm2, 8	 # tmp205, _37,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd231ps	ymm0, ymm2, ymm12	 # tmp209, tmp205, tmp211
+	vfnmadd231ps	ymm0, ymm2, ymm10	 # tmp212, tmp205, tmp214
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:443:   return (__m256i)__builtin_ia32_cvttps2dq256 ((__v8sf) __A);
+	vcvttps2dq	ymm2, ymm2	 # tmp234, tmp205
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm1, ymm3, ymm0	 # tmp215, tmp219, tmp212
+	vbroadcastss	ymm3, DWORD PTR .LC15[rip]	 # tmp222,
+	vfmadd132ps	ymm1, ymm3, ymm0	 # tmp220, tmp222, tmp212
+	vbroadcastss	ymm3, DWORD PTR .LC17[rip]	 # tmp225,
+	vfmadd132ps	ymm1, ymm3, ymm0	 # tmp223, tmp225, tmp212
+	vbroadcastss	ymm3, DWORD PTR .LC19[rip]	 # tmp228,
+	vfmadd132ps	ymm1, ymm3, ymm0	 # tmp226, tmp228, tmp212
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm3, ymm0, ymm0	 # _41, tmp212, tmp212
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm1, ymm11, ymm0	 # tmp229, tmp231, tmp212
+	vfmadd132ps	ymm1, ymm0, ymm3	 # tmp232, tmp212, _41
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:121:   return (__m256i) ((__v8su)__A + (__v8su)__B);
+	vpcmpeqd	ymm0, ymm0, ymm0	 # tmp239
+	vpsrld	ymm0, ymm0, 25	 # tmp238, tmp239,
+	vpaddd	ymm2, ymm2, ymm0	 # _51, tmp234, tmp238
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm0, DWORD PTR .LC57[rip]	 # tmp248,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:684:   return (__m256i)__builtin_ia32_pslldi256 ((__v8si)__A, __B);
+	vpslld	ymm2, ymm2, 23	 # tmp235, _51,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm1, ymm1, ymm5	 # _48, tmp232, tmp242
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm1, ymm1, ymm2	 # _55, _48, tmp235
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm2, DWORD PTR .LC59[rip]	 # tmp257,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm3, ymm1, ymm5	 # _12, _55, tmp242
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vmaxps	ymm0, ymm3, ymm0	 # _58, _12, tmp248
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm7, ymm3, ymm7, 2	 # tmp245, _12, tmp186,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:775:   return (__m256i)__builtin_ia32_psrldi256 ((__v8si)__A, __B);
+	vpsrld	ymm4, ymm0, 23	 # tmp254, _58,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm0, ymm0, ymm2	 # tmp255, _58, tmp257
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:817:   return (__m256i) ((__v8su)__A - (__v8su)__B);
+	vmovd	xmm2, edx	 # tmp264, tmp265
+	vpbroadcastd	ymm2, xmm2	 # tmp264, tmp264
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
+	vorps	ymm0, ymm0, ymm11	 # tmp258, tmp255, tmp231
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:817:   return (__m256i) ((__v8su)__A - (__v8su)__B);
+	vpaddd	ymm4, ymm4, ymm2	 # _64, tmp254, tmp264
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vbroadcastss	ymm2, DWORD PTR .LC62[rip]	 # tmp268,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:407:   return (__m256)__builtin_ia32_cvtdq2ps256 ((__v8si) __A);
+	vcvtdq2ps	ymm4, ymm4	 # tmp261, _64
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm4, ymm4, ymm5	 # _67, tmp261, tmp242
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm2, ymm0, ymm2, 1	 # tmp266, tmp258, tmp268,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm9, ymm0, ymm2	 # tmp269, tmp258, tmp266
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vaddps	ymm0, ymm0, ymm8	 # _70, tmp258, tmp278
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm2, ymm5, ymm2	 # tmp270, tmp242, tmp266
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vsubps	ymm4, ymm4, ymm2	 # _72, _67, tmp270
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm5, ymm3, ymm5, 0	 # tmp318, _12, tmp242,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm2, DWORD PTR .LC64[rip]	 # tmp281,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm0, ymm0, ymm9	 # _73, _70, tmp269
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm9, ymm0, ymm0	 # _74, _73, _73
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp279, tmp283, _73
+	vbroadcastss	ymm13, DWORD PTR .LC68[rip]	 # tmp286,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp284, tmp286, _73
+	vbroadcastss	ymm13, DWORD PTR .LC70[rip]	 # tmp289,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp287, tmp289, _73
+	vbroadcastss	ymm13, DWORD PTR .LC72[rip]	 # tmp292,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp290, tmp292, _73
+	vbroadcastss	ymm13, DWORD PTR .LC74[rip]	 # tmp295,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp293, tmp295, _73
+	vbroadcastss	ymm13, DWORD PTR .LC76[rip]	 # tmp298,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp296, tmp298, _73
+	vbroadcastss	ymm13, DWORD PTR .LC78[rip]	 # tmp301,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp299, tmp301, _73
+	vbroadcastss	ymm13, DWORD PTR .LC80[rip]	 # tmp304,
+	vfmadd132ps	ymm2, ymm13, ymm0	 # tmp302, tmp304, _73
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm2, ymm0, ymm2	 # _83, _73, tmp302
+	vmulps	ymm2, ymm2, ymm9	 # _84, _83, _74
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm10, ymm2, ymm4	 # tmp305, _84, _72
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vbroadcastss	ymm2, DWORD PTR .LC55[rip]	 # tmp329,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd132ps	ymm9, ymm10, ymm11	 # tmp310, tmp305, tmp231
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm10, ymm1, ymm8, 0	 # tmp321, _55, tmp278,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm0, ymm0, ymm9	 # _87, _73, tmp310
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm9, ymm1, ymm8, 1	 # tmp324, _55, tmp278,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm4, ymm0, ymm12	 # tmp313, _87, tmp211
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vaddps	ymm0, ymm3, ymm8	 # _14, _12, tmp278
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:227:   return (__m256) ((__v8sf)__A / (__v8sf)__B);
+	vdivps	ymm0, ymm1, ymm0	 # _15, _55, _14
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
+	vorps	ymm4, ymm4, ymm7	 # tmp317, tmp313, tmp245
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vcmpps	ymm7, ymm1, ymm2, 0	 # tmp327, _55, tmp329,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm0, ymm4	 # _16, _15, tmp317
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vblendvps	ymm0, ymm0, ymm1, ymm5	 # tmp342, _16, _55, tmp318
+	vbroadcastss	ymm1, DWORD PTR .LC86[rip]	 # tmp352,
+	vblendvps	ymm0, ymm0, ymm1, ymm10	 # tmp338, tmp342, tmp352, tmp321
+	vbroadcastss	ymm1, DWORD PTR .LC88[rip]	 # tmp354,
+	vblendvps	ymm0, ymm0, ymm1, ymm9	 # tmp334, tmp338, tmp354, tmp324
+	vblendvps	ymm0, ymm0, ymm2, ymm7	 # tmp330, tmp334, tmp329, tmp327
+	vaddps	ymm0, ymm0, ymm6	 # _11, tmp330, _7
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
+	vmovups	YMMWORD PTR [rcx], ymm0	 # <retval>, _11
+	vzeroupper
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256 avx2k_softplus_ps(__m256 x){ return avx2_softplus_ps(x); }
+	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
+	vmovups	xmm7, XMMWORD PTR 16[rsp]	 #,
+	vmovups	xmm8, XMMWORD PTR 32[rsp]	 #,
+	vmovups	xmm9, XMMWORD PTR 48[rsp]	 #,
+	vmovups	xmm10, XMMWORD PTR 64[rsp]	 #,
+	vmovups	xmm11, XMMWORD PTR 80[rsp]	 #,
+	vmovups	xmm12, XMMWORD PTR 96[rsp]	 #,
+	vmovups	xmm13, XMMWORD PTR 112[rsp]	 #,
+	add	rsp, 136	 #,
+	ret	
+	.seh_endproc
+	.p2align 4
+	.globl	avx2k_gelu_ps
+	.def	avx2k_gelu_ps;	.scl	2;	.type	32;	.endef
+	.seh_proc	avx2k_gelu_ps
+avx2k_gelu_ps:
+	sub	rsp, 88	 #,
+	.seh_stackalloc	88
+	vmovups	XMMWORD PTR [rsp], xmm6	 #,
+	.seh_savexmm	xmm6, 0
+	vmovups	XMMWORD PTR 16[rsp], xmm7	 #,
+	.seh_savexmm	xmm7, 16
+	vmovups	XMMWORD PTR 32[rsp], xmm8	 #,
+	.seh_savexmm	xmm8, 32
+	vmovups	XMMWORD PTR 48[rsp], xmm9	 #,
+	.seh_savexmm	xmm9, 48
+	vmovups	XMMWORD PTR 64[rsp], xmm10	 #,
+	.seh_savexmm	xmm10, 64
+	.seh_endprologue
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm4, DWORD PTR .LC24[rip]	 # tmp155,
+	vbroadcastss	ymm1, DWORD PTR .LC108[rip]	 # tmp152,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:170:   return (__m256) __builtin_ia32_andnps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm5, DWORD PTR .LC48[rip]	 # tmp161,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vbroadcastss	ymm2, DWORD PTR .LC90[rip]	 # tmp166,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:292:   return (__m256) __builtin_ia32_minps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm7, DWORD PTR .LC1[rip]	 # tmp169,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
+	vmovups	ymm3, YMMWORD PTR [rdx]	 # x, x
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm8, DWORD PTR .LC7[rip]	 # tmp188,
+	vbroadcastss	ymm9, DWORD PTR .LC9[rip]	 # tmp191,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm3, ymm3	 # _5, x, x
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
+	mov	rax, rcx	 # .result_ptr, .result_ptr
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm1, ymm4, ymm0	 # tmp150, tmp155, _5
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vbroadcastss	ymm0, DWORD PTR .LC110[rip]	 # tmp158,
+	vmulps	ymm1, ymm3, ymm1	 # _7, x, tmp150
+	vmulps	ymm1, ymm1, ymm0	 # _8, _7, tmp158
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vxorps	xmm0, xmm0, xmm0	 # tmp167
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:170:   return (__m256) __builtin_ia32_andnps256 ((__v8sf)__A, (__v8sf)__B);
+	vandnps	ymm6, ymm5, ymm1	 # tmp159, tmp161, _8
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
+	vandps	ymm5, ymm5, ymm1	 # tmp162, tmp161, _8
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:352:   return (__m256) ((__v8sf)__A - (__v8sf)__B);
+	vfnmadd231ps	ymm0, ymm6, ymm2	 # _16, tmp159, tmp166
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:292:   return (__m256) __builtin_ia32_minps256 ((__v8sf)__A, (__v8sf)__B);
+	vminps	ymm0, ymm0, ymm7	 # _35, _16, tmp169
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
+	vbroadcastss	ymm7, DWORD PTR .LC3[rip]	 # tmp176,
+	vmaxps	ymm0, ymm0, ymm7	 # _37, _35, tmp176
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vbroadcastss	ymm7, DWORD PTR .LC5[rip]	 # tmp185,
+	vmulps	ymm7, ymm0, ymm7	 # _38, _37, tmp185
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:1010:   return (__m256) __builtin_ia32_roundps256 ((__v8sf)__V, __M);
+	vroundps	ymm7, ymm7, 8	 # tmp182, _38,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd231ps	ymm0, ymm7, ymm8	 # tmp186, tmp182, tmp188
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm8, DWORD PTR .LC13[rip]	 # tmp196,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd132ps	ymm9, ymm0, ymm7	 # tmp189, tmp186, tmp182
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:443:   return (__m256i)__builtin_ia32_cvttps2dq256 ((__v8sf) __A);
+	vcvttps2dq	ymm7, ymm7	 # tmp211, tmp182
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm0, DWORD PTR .LC11[rip]	 # tmp194,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm10, ymm9, ymm9	 # _42, tmp189, tmp189
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm0, ymm8, ymm9	 # tmp192, tmp196, tmp189
+	vbroadcastss	ymm8, DWORD PTR .LC15[rip]	 # tmp199,
+	vfmadd132ps	ymm0, ymm8, ymm9	 # tmp197, tmp199, tmp189
+	vbroadcastss	ymm8, DWORD PTR .LC17[rip]	 # tmp202,
+	vfmadd132ps	ymm0, ymm8, ymm9	 # tmp200, tmp202, tmp189
+	vbroadcastss	ymm8, DWORD PTR .LC19[rip]	 # tmp205,
+	vfmadd132ps	ymm0, ymm8, ymm9	 # tmp203, tmp205, tmp189
+	vbroadcastss	ymm8, DWORD PTR .LC21[rip]	 # tmp208,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm3, ymm3, ymm8	 # _11, x, tmp208
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm0, ymm8, ymm9	 # tmp206, tmp208, tmp189
+	vfmadd132ps	ymm0, ymm9, ymm10	 # tmp209, tmp189, _42
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:121:   return (__m256i) ((__v8su)__A + (__v8su)__B);
+	vpcmpeqd	ymm9, ymm9, ymm9	 # tmp216
+	vpsrld	ymm9, ymm9, 25	 # tmp215, tmp216,
+	vpaddd	ymm7, ymm7, ymm9	 # _52, tmp211, tmp215
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm9, DWORD PTR .LC94[rip]	 # tmp234,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:684:   return (__m256i)__builtin_ia32_pslldi256 ((__v8si)__A, __B);
+	vpslld	ymm7, ymm7, 23	 # tmp212, _52,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm0, ymm0, ymm4	 # _49, tmp209, tmp155
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm0, ymm0, ymm7	 # _56, _49, tmp212
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vaddps	ymm7, ymm0, ymm4	 # _18, _56, tmp155
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:227:   return (__m256) ((__v8sf)__A / (__v8sf)__B);
+	vdivps	ymm0, ymm0, ymm7	 # _19, _56, _18
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm7, ymm1, ymm1	 # _22, _8, _8
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:161:   return (__m256)__builtin_ia32_vfnmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfnmadd132ps	ymm2, ymm4, ymm0	 # tmp220, tmp155, _19
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vbroadcastss	ymm0, DWORD PTR .LC92[rip]	 # tmp232,
+	vfmadd132ps	ymm0, ymm9, ymm7	 # tmp230, tmp234, _22
+	vbroadcastss	ymm9, DWORD PTR .LC96[rip]	 # tmp237,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
+	vorps	ymm2, ymm2, ymm5	 # tmp229, tmp220, tmp162
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm0, ymm9, ymm7	 # tmp235, tmp237, _22
+	vbroadcastss	ymm9, DWORD PTR .LC98[rip]	 # tmp240,
+	vfmadd132ps	ymm0, ymm9, ymm7	 # tmp238, tmp240, _22
+	vbroadcastss	ymm9, DWORD PTR .LC100[rip]	 # tmp243,
+	vfmadd132ps	ymm0, ymm9, ymm7	 # tmp241, tmp243, _22
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm7, ymm7, ymm0	 # _27, _22, tmp241
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
+	vbroadcastss	ymm0, DWORD PTR .LC102[rip]	 # tmp249,
+	vcmpps	ymm6, ymm6, ymm0, 1	 # tmp247, tmp159, tmp249,
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
+	vfmadd132ps	ymm1, ymm1, ymm7	 # tmp244, _8, _27
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
+	vorps	ymm1, ymm1, ymm5	 # tmp246, tmp244, tmp162
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
+	vblendvps	ymm2, ymm2, ymm1, ymm6	 # tmp250, tmp229, tmp246, tmp247
+	vaddps	ymm2, ymm2, ymm4	 # _10, tmp250, tmp155
+ # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:304:   return (__m256) ((__v8sf)__A * (__v8sf)__B);
+	vmulps	ymm3, ymm2, ymm3	 # _12, _10, _11
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
+	vmovups	YMMWORD PTR [rcx], ymm3	 # <retval>, _12
+	vzeroupper
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256 avx2k_gelu_ps  (__m256 x) { return avx2_gelu_ps(x); }
+	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
+	vmovups	xmm7, XMMWORD PTR 16[rsp]	 #,
+	vmovups	xmm8, XMMWORD PTR 32[rsp]	 #,
+	vmovups	xmm9, XMMWORD PTR 48[rsp]	 #,
+	vmovups	xmm10, XMMWORD PTR 64[rsp]	 #,
+	add	rsp, 88	 #,
+	ret	
+	.seh_endproc
+	.p2align 4
 	.globl	avx2k_pow_ps
 	.def	avx2k_pow_ps;	.scl	2;	.type	32;	.endef
 	.seh_proc	avx2k_pow_ps
@@ -1031,7 +1543,7 @@ avx2k_pow_ps:
 	vbroadcastss	ymm6, DWORD PTR .LC21[rip]	 # tmp200,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:378:   return (__m256) __builtin_ia32_cmpps256 ((__v8sf)__X, (__v8sf)__Y,
 	vbroadcastss	ymm9, DWORD PTR .LC62[rip]	 # tmp208,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	vmovups	ymm2, YMMWORD PTR [rdx]	 # a, a
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:817:   return (__m256i) ((__v8su)__A - (__v8su)__B);
 	mov	edx, -127	 # tmp205,
@@ -1039,7 +1551,7 @@ avx2k_pow_ps:
 	vbroadcastss	ymm10, DWORD PTR .LC46[rip]	 # tmp215,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:65:   return (__m256)__builtin_ia32_vfmaddps256 ((__v8sf)__A, (__v8sf)__B,
 	vbroadcastss	ymm11, DWORD PTR .LC66[rip]	 # tmp220,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	vmovups	ymm3, YMMWORD PTR [r8]	 # b, b
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:280:   return (__m256) __builtin_ia32_maxps256 ((__v8sf)__A, (__v8sf)__B);
 	vmaxps	ymm0, ymm2, ymm0	 # _63, a, tmp188
@@ -1047,7 +1559,7 @@ avx2k_pow_ps:
 	vcmpps	ymm8, ymm2, ymm5, 2	 # tmp185, a, tmp186,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:158:   return (__m256) __builtin_ia32_andps256 ((__v8sf)__A, (__v8sf)__B);
 	vbroadcastss	ymm4, DWORD PTR .LC24[rip]	 # tmp212,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	mov	rax, rcx	 # .result_ptr, .result_ptr
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:775:   return (__m256i)__builtin_ia32_psrldi256 ((__v8si)__A, __B);
 	vpsrld	ymm7, ymm0, 23	 # tmp194, _63,
@@ -1164,7 +1676,7 @@ avx2k_pow_ps:
 	vpxor	xmm1, xmm1, xmm1	 # tmp302
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:684:   return (__m256i)__builtin_ia32_pslldi256 ((__v8si)__A, __B);
 	vpslld	ymm7, ymm7, 23	 # tmp294, _56,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	vpcmpgtd	ymm3, ymm1, ymm3	 # tmp328, tmp302, tmp320
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:133:   return (__m256) ((__v8sf)__A + (__v8sf)__B);
 	vaddps	ymm0, ymm0, ymm4	 # _53, tmp291, tmp212
@@ -1178,7 +1690,7 @@ avx2k_pow_ps:
 	vcmpps	ymm2, ymm2, ymm4, 0	 # tmp317, a, tmp212,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:316:   return (__m256) __builtin_ia32_orps256 ((__v8sf)__A, (__v8sf)__B);
 	vorps	ymm6, ymm6, ymm10	 # tmp316, tmp315, tmp314
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	vpcmpgtd	ymm2, ymm1, ymm2	 # tmp325, tmp302, tmp317
 	vpcmpgtd	ymm1, ymm1, ymm9	 # tmp341, tmp302, tmp310
 	vpor	ymm2, ymm2, ymm3	 # _37, tmp325, tmp328
@@ -1189,7 +1701,7 @@ avx2k_pow_ps:
 	vblendvps	ymm0, ymm0, ymm4, ymm2	 # tmp322, tmp330, tmp212, _37
 	vmovups	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp322
 	vzeroupper
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:35: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:40: KW __m256 avx2k_pow_ps   (__m256 a, __m256 b) { return avx2_pow_ps(a, b); }
 	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
 	vmovups	xmm7, XMMWORD PTR 16[rsp]	 #,
 	vmovups	xmm8, XMMWORD PTR 32[rsp]	 #,
@@ -1214,12 +1726,12 @@ avx2k_exp_pd:
 	.seh_savexmm	xmm8, 32
 	.seh_endprologue
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:371:   return (__m256d) __builtin_ia32_cmppd256 ((__v4df)__X, (__v4df)__Y,
-	vbroadcastsd	ymm2, QWORD PTR .LC104[rip]	 # tmp153,
-	vbroadcastsd	ymm1, QWORD PTR .LC106[rip]	 # tmp156,
+	vbroadcastsd	ymm2, QWORD PTR .LC112[rip]	 # tmp153,
+	vbroadcastsd	ymm1, QWORD PTR .LC114[rip]	 # tmp156,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm6, QWORD PTR .LC116[rip]	 # tmp186,
-	vbroadcastsd	ymm8, QWORD PTR .LC118[rip]	 # tmp189,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
+	vbroadcastsd	ymm6, QWORD PTR .LC124[rip]	 # tmp186,
+	vbroadcastsd	ymm8, QWORD PTR .LC126[rip]	 # tmp189,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:43: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
 	vmovupd	ymm0, YMMWORD PTR [rdx]	 # x, x
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:371:   return (__m256d) __builtin_ia32_cmppd256 ((__v4df)__X, (__v4df)__Y,
 	vcmppd	ymm5, ymm0, ymm2, 30	 # tmp151, x, tmp153,
@@ -1228,41 +1740,41 @@ avx2k_exp_pd:
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:286:   return (__m256d) __builtin_ia32_minpd256 ((__v4df)__A, (__v4df)__B);
 	vminpd	ymm0, ymm0, ymm2	 # _9, x, tmp153
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:145:   return (__m256d)__builtin_ia32_vfnmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm2, QWORD PTR .LC110[rip]	 # tmp178,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
+	vbroadcastsd	ymm2, QWORD PTR .LC118[rip]	 # tmp178,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:43: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
 	mov	rax, rcx	 # .result_ptr, .result_ptr
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:274:   return (__m256d) __builtin_ia32_maxpd256 ((__v4df)__A, (__v4df)__B);
 	vmaxpd	ymm1, ymm0, ymm1	 # _11, _9, tmp156
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
-	vbroadcastsd	ymm0, QWORD PTR .LC108[rip]	 # tmp175,
+	vbroadcastsd	ymm0, QWORD PTR .LC116[rip]	 # tmp175,
 	vmulpd	ymm0, ymm1, ymm0	 # _12, _11, tmp175
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:1004:   return (__m256d) __builtin_ia32_roundpd256 ((__v4df)__V, __M);
 	vroundpd	ymm0, ymm0, 8	 # tmp172, _12,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:145:   return (__m256d)__builtin_ia32_vfnmaddpd256 ((__v4df)__A, (__v4df)__B,
 	vfnmadd132pd	ymm2, ymm1, ymm0	 # tmp176, _11, tmp172
-	vbroadcastsd	ymm1, QWORD PTR .LC112[rip]	 # tmp181,
+	vbroadcastsd	ymm1, QWORD PTR .LC120[rip]	 # tmp181,
 	vfnmadd132pd	ymm1, ymm2, ymm0	 # tmp179, tmp176, tmp172
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:437:   return (__m128i)__builtin_ia32_cvtpd2dq256 ((__v4df) __A);
 	vcvtpd2dq	xmm0, ymm0	 # tmp208, tmp172
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm2, QWORD PTR .LC114[rip]	 # tmp184,
+	vbroadcastsd	ymm2, QWORD PTR .LC122[rip]	 # tmp184,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm7, ymm1, ymm1	 # _16, tmp179, tmp179
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
 	vfmadd132pd	ymm2, ymm6, ymm7	 # tmp182, tmp186, _16
-	vbroadcastsd	ymm6, QWORD PTR .LC120[rip]	 # tmp192,
+	vbroadcastsd	ymm6, QWORD PTR .LC128[rip]	 # tmp192,
 	vfmadd132pd	ymm2, ymm8, ymm7	 # tmp187, tmp189, _16
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm2, ymm1, ymm2	 # _19, tmp179, tmp187
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm1, QWORD PTR .LC122[rip]	 # tmp194,
+	vbroadcastsd	ymm1, QWORD PTR .LC130[rip]	 # tmp194,
 	vfmadd132pd	ymm6, ymm1, ymm7	 # tmp190, tmp194, _16
-	vbroadcastsd	ymm1, QWORD PTR .LC124[rip]	 # tmp197,
+	vbroadcastsd	ymm1, QWORD PTR .LC132[rip]	 # tmp197,
 	vfmadd132pd	ymm6, ymm1, ymm7	 # tmp195, tmp197, _16
-	vbroadcastsd	ymm1, QWORD PTR .LC126[rip]	 # tmp200,
+	vbroadcastsd	ymm1, QWORD PTR .LC134[rip]	 # tmp200,
 	vfmadd132pd	ymm6, ymm1, ymm7	 # tmp198, tmp200, _16
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:128:   return (__m256i) ((__v4du)__A + (__v4du)__B);
-	vpbroadcastq	ymm7, QWORD PTR .LC132[rip]	 # tmp216,
+	vpbroadcastq	ymm7, QWORD PTR .LC140[rip]	 # tmp216,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
 	vsubpd	ymm6, ymm6, ymm2	 # _23, tmp198, _19
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:221:   return (__m256d) ((__v4df)__A / (__v4df)__B);
@@ -1287,19 +1799,19 @@ avx2k_exp_pd:
 	vpsllq	ymm2, ymm2, 52	 # tmp218, _39,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm0, ymm1, ymm0	 # _43, tmp201, tmp213
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
-	vbroadcastsd	ymm1, QWORD PTR .LC129[rip]	 # tmp238,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:43: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
+	vbroadcastsd	ymm1, QWORD PTR .LC137[rip]	 # tmp238,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm0, ymm0, ymm2	 # _45, _43, tmp218
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:43: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
 	vblendvpd	ymm0, ymm0, ymm1, ymm5	 # tmp231, _45, tmp238, tmp151
 	vxorpd	xmm1, xmm1, xmm1	 # tmp239
 	vblendvpd	ymm0, ymm0, ymm1, ymm4	 # tmp227, tmp231, tmp239, tmp154
-	vbroadcastsd	ymm1, QWORD PTR .LC131[rip]	 # tmp241,
+	vbroadcastsd	ymm1, QWORD PTR .LC139[rip]	 # tmp241,
 	vblendvpd	ymm0, ymm0, ymm1, ymm3	 # tmp223, tmp227, tmp241, tmp157
 	vmovupd	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp223
 	vzeroupper
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:38: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:43: KW __m256d avx2k_exp_pd  (__m256d x) { return avx2_exp_pd(x); }
 	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
 	vmovups	xmm7, XMMWORD PTR 16[rsp]	 #,
 	vmovups	xmm8, XMMWORD PTR 32[rsp]	 #,
@@ -1331,13 +1843,13 @@ avx2k_log_pd:
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:205:   return (__m256d) __builtin_ia32_blendvpd256 ((__v4df)__X,
 	vpxor	xmm5, xmm5, xmm5	 # tmp178
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
-	vbroadcastsd	ymm0, QWORD PTR .LC136[rip]	 # tmp182,
+	vbroadcastsd	ymm0, QWORD PTR .LC144[rip]	 # tmp182,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:371:   return (__m256d) __builtin_ia32_cmppd256 ((__v4df)__X, (__v4df)__Y,
-	vbroadcastsd	ymm10, QWORD PTR .LC134[rip]	 # tmp176,
-	vbroadcastsd	ymm6, QWORD PTR .LC129[rip]	 # tmp173,
+	vbroadcastsd	ymm10, QWORD PTR .LC142[rip]	 # tmp176,
+	vbroadcastsd	ymm6, QWORD PTR .LC137[rip]	 # tmp173,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:152:   return (__m256d) __builtin_ia32_andpd256 ((__v4df)__A, (__v4df)__B);
-	vbroadcastsd	ymm9, QWORD PTR .LC142[rip]	 # tmp203,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+	vbroadcastsd	ymm9, QWORD PTR .LC150[rip]	 # tmp203,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	vmovupd	ymm1, YMMWORD PTR [rdx]	 # x, x
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm0, ymm1, ymm0	 # _10, x, tmp182
@@ -1347,39 +1859,39 @@ avx2k_log_pd:
 	vcmppd	ymm8, ymm1, ymm1, 3	 # tmp166, x, x,
 	vcmppd	ymm3, ymm1, ymm4, 17	 # tmp167, x, tmp168,
 	vcmppd	ymm4, ymm1, ymm4, 0	 # tmp169, x, tmp168,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	mov	rax, rcx	 # .result_ptr, .result_ptr
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:152:   return (__m256d) __builtin_ia32_andpd256 ((__v4df)__A, (__v4df)__B);
 	vandpd	ymm9, ymm10, ymm9	 # tmp201, tmp174, tmp203
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:205:   return (__m256d) __builtin_ia32_blendvpd256 ((__v4df)__X,
 	vblendvpd	ymm1, ymm1, ymm0, ymm10	 # _13, x, _10, tmp174
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	vpcmpgtq	ymm3, ymm5, ymm3	 # tmp266, tmp178, tmp167
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:181:   return (__m256i) ((__v4du)__A & (__v4du)__B);
-	vpbroadcastq	ymm0, QWORD PTR .LC179[rip]	 # tmp185,
+	vpbroadcastq	ymm0, QWORD PTR .LC187[rip]	 # tmp185,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
-	vbroadcastsd	ymm10, QWORD PTR .LC146[rip]	 # tmp210,
+	vbroadcastsd	ymm10, QWORD PTR .LC154[rip]	 # tmp210,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:789:   return (__m256i)__builtin_ia32_psrlqi256 ((__v4di)__A, __B);
 	vpsrlq	ymm2, ymm1, 52	 # tmp183, _13,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	vpcmpgtq	ymm5, ymm5, ymm8	 # tmp269, tmp178, tmp166
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:181:   return (__m256i) ((__v4du)__A & (__v4du)__B);
 	vpand	ymm2, ymm2, ymm0	 # _17, tmp183, tmp185
-	vbroadcastsd	ymm0, QWORD PTR .LC139[rip]	 # tmp190,
+	vbroadcastsd	ymm0, QWORD PTR .LC147[rip]	 # tmp190,
 	vandpd	ymm1, ymm1, ymm0	 # tmp188, _13, tmp190
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:1422:   return (__m128i) __builtin_ia32_si_si256 ((__v8si)__A);
 	vmovdqa	xmm0, xmm2	 # tmp195, _17
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:1098:   return (__m128i) __builtin_ia32_extract128i256 ((__v4di)__X, __M);
 	vextracti128	xmm2, ymm2, 0x1	 # tmp196, _17
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx2intrin.h:576:   return (__m256i) ((__v4du)__A | (__v4du)__B);
-	vpor	ymm1, ymm1, YMMWORD PTR .LC140[rip]	 # _21, tmp188,
+	vpor	ymm1, ymm1, YMMWORD PTR .LC148[rip]	 # _21, tmp188,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h:794:   return (__m128) __builtin_ia32_shufps ((__v4sf)__A, (__v4sf)__B, __mask);
 	vshufps	xmm0, xmm0, xmm2, 136	 # _28, tmp195, tmp196,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:401:   return (__m256d)__builtin_ia32_cvtdq2pd256 ((__v4si) __A);
 	vcvtdq2pd	ymm0, xmm0	 # tmp197, _28
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:371:   return (__m256d) __builtin_ia32_cmppd256 ((__v4df)__X, (__v4df)__Y,
-	vbroadcastsd	ymm2, QWORD PTR .LC144[rip]	 # tmp206,
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+	vbroadcastsd	ymm2, QWORD PTR .LC152[rip]	 # tmp206,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	vpor	ymm3, ymm3, ymm5	 # _68, tmp266, tmp269
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:371:   return (__m256d) __builtin_ia32_cmppd256 ((__v4df)__X, (__v4df)__Y,
 	vcmppd	ymm2, ymm1, ymm2, 17	 # tmp204, _21, tmp206,
@@ -1388,18 +1900,18 @@ avx2k_log_pd:
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
 	vaddpd	ymm1, ymm10, ymm1	 # _36, tmp210, _21
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:152:   return (__m256d) __builtin_ia32_andpd256 ((__v4df)__A, (__v4df)__B);
-	vbroadcastsd	ymm10, QWORD PTR .LC118[rip]	 # tmp213,
+	vbroadcastsd	ymm10, QWORD PTR .LC126[rip]	 # tmp213,
 	vandpd	ymm2, ymm2, ymm10	 # tmp211, tmp204, tmp213
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
-	vbroadcastsd	ymm10, QWORD PTR .LC148[rip]	 # tmp216,
+	vbroadcastsd	ymm10, QWORD PTR .LC156[rip]	 # tmp216,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:127:   return (__m256d) ((__v4df)__A + (__v4df)__B);
 	vaddpd	ymm1, ymm1, ymm11	 # _37, _36, tmp207
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm11, QWORD PTR .LC164[rip]	 # tmp240,
+	vbroadcastsd	ymm11, QWORD PTR .LC172[rip]	 # tmp240,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
 	vaddpd	ymm0, ymm0, ymm10	 # _31, tmp197, tmp216
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm10, QWORD PTR .LC152[rip]	 # tmp222,
+	vbroadcastsd	ymm10, QWORD PTR .LC160[rip]	 # tmp222,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
 	vsubpd	ymm0, ymm0, ymm9	 # _33, _31, tmp201
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
@@ -1407,54 +1919,54 @@ avx2k_log_pd:
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:346:   return (__m256d) ((__v4df)__A - (__v4df)__B);
 	vsubpd	ymm0, ymm0, ymm2	 # _39, _33, tmp211
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm2, QWORD PTR .LC150[rip]	 # tmp220,
+	vbroadcastsd	ymm2, QWORD PTR .LC158[rip]	 # tmp220,
 	vfmadd132pd	ymm2, ymm10, ymm1	 # tmp218, tmp222, _37
-	vbroadcastsd	ymm10, QWORD PTR .LC154[rip]	 # tmp225,
+	vbroadcastsd	ymm10, QWORD PTR .LC162[rip]	 # tmp225,
 	vfmadd132pd	ymm2, ymm10, ymm1	 # tmp223, tmp225, _37
-	vbroadcastsd	ymm10, QWORD PTR .LC156[rip]	 # tmp228,
+	vbroadcastsd	ymm10, QWORD PTR .LC164[rip]	 # tmp228,
 	vfmadd132pd	ymm2, ymm10, ymm1	 # tmp226, tmp228, _37
-	vbroadcastsd	ymm10, QWORD PTR .LC158[rip]	 # tmp231,
+	vbroadcastsd	ymm10, QWORD PTR .LC166[rip]	 # tmp231,
 	vfmadd132pd	ymm2, ymm10, ymm1	 # tmp229, tmp231, _37
-	vbroadcastsd	ymm10, QWORD PTR .LC160[rip]	 # tmp234,
+	vbroadcastsd	ymm10, QWORD PTR .LC168[rip]	 # tmp234,
 	vfmadd231pd	ymm10, ymm2, ymm1	 # tmp232, tmp229, _37
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:127:   return (__m256d) ((__v4df)__A + (__v4df)__B);
-	vbroadcastsd	ymm2, QWORD PTR .LC162[rip]	 # tmp238,
+	vbroadcastsd	ymm2, QWORD PTR .LC170[rip]	 # tmp238,
 	vaddpd	ymm2, ymm1, ymm2	 # _46, _37, tmp238
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
 	vfmadd132pd	ymm2, ymm11, ymm1	 # tmp235, tmp240, _37
-	vbroadcastsd	ymm11, QWORD PTR .LC166[rip]	 # tmp243,
+	vbroadcastsd	ymm11, QWORD PTR .LC174[rip]	 # tmp243,
 	vfmadd132pd	ymm2, ymm11, ymm1	 # tmp241, tmp243, _37
-	vbroadcastsd	ymm11, QWORD PTR .LC168[rip]	 # tmp246,
+	vbroadcastsd	ymm11, QWORD PTR .LC176[rip]	 # tmp246,
 	vfmadd132pd	ymm2, ymm11, ymm1	 # tmp244, tmp246, _37
-	vbroadcastsd	ymm11, QWORD PTR .LC170[rip]	 # tmp249,
+	vbroadcastsd	ymm11, QWORD PTR .LC178[rip]	 # tmp249,
 	vfmadd132pd	ymm2, ymm11, ymm1	 # tmp247, tmp249, _37
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:221:   return (__m256d) ((__v4df)__A / (__v4df)__B);
 	vdivpd	ymm2, ymm10, ymm2	 # _51, tmp232, tmp247
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm10, QWORD PTR .LC172[rip]	 # tmp252,
+	vbroadcastsd	ymm10, QWORD PTR .LC180[rip]	 # tmp252,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:298:   return (__m256d) ((__v4df)__A * (__v4df)__B);
 	vmulpd	ymm2, ymm2, ymm9	 # _52, _51, _40
 	vmulpd	ymm2, ymm2, ymm1	 # _53, _52, _37
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
 	vfmadd231pd	ymm2, ymm0, ymm10	 # tmp250, _39, tmp252
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:145:   return (__m256d)__builtin_ia32_vfnmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm10, QWORD PTR .LC174[rip]	 # tmp258,
+	vbroadcastsd	ymm10, QWORD PTR .LC182[rip]	 # tmp258,
 	vfnmadd132pd	ymm9, ymm2, ymm10	 # tmp256, tmp250, tmp258
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
-	vbroadcastsd	ymm2, QWORD PTR .LC176[rip]	 # tmp261,
+	vbroadcastsd	ymm2, QWORD PTR .LC184[rip]	 # tmp261,
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxintrin.h:127:   return (__m256d) ((__v4df)__A + (__v4df)__B);
 	vaddpd	ymm1, ymm1, ymm9	 # _56, _37, tmp256
  # C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/fmaintrin.h:49:   return (__m256d)__builtin_ia32_vfmaddpd256 ((__v4df)__A, (__v4df)__B,
 	vfmadd132pd	ymm0, ymm1, ymm2	 # tmp259, _56, tmp261
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
-	vbroadcastsd	ymm1, QWORD PTR .LC178[rip]	 # tmp282,
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+	vbroadcastsd	ymm1, QWORD PTR .LC186[rip]	 # tmp282,
 	vblendvpd	ymm0, ymm0, ymm6, ymm7	 # tmp275, tmp259, tmp173, tmp171
 	vblendvpd	ymm0, ymm0, ymm1, ymm4	 # tmp271, tmp275, tmp282, tmp169
-	vbroadcastsd	ymm1, QWORD PTR .LC131[rip]	 # tmp284,
+	vbroadcastsd	ymm1, QWORD PTR .LC139[rip]	 # tmp284,
 	vblendvpd	ymm0, ymm0, ymm1, ymm3	 # tmp263, tmp271, tmp284, _68
 	vmovupd	YMMWORD PTR [rcx], ymm0	 # <retval>, tmp263
 	vzeroupper
- # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:39: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
+ # C:\Users\sora5\AVX2_Fast_Apr\study\kernels.c:44: KW __m256d avx2k_log_pd  (__m256d x) { return avx2_log_pd(x); }
 	vmovups	xmm6, XMMWORD PTR [rsp]	 #,
 	vmovups	xmm7, XMMWORD PTR 16[rsp]	 #,
 	vmovups	xmm8, XMMWORD PTR 32[rsp]	 #,
@@ -1594,7 +2106,7 @@ avx2k_log_pd:
 	.align 4
 .LC88:
 	.long	2143289344
-	.set	.LC90,.LC126+4
+	.set	.LC90,.LC134+4
 	.align 4
 .LC92:
 	.long	-1145376534
@@ -1613,157 +2125,166 @@ avx2k_log_pd:
 	.align 4
 .LC102:
 	.long	1059061760
-	.align 8
+	.align 4
 .LC104:
+	.long	1069547520
+	.align 4
+.LC108:
+	.long	1027024659
+	.align 4
+.LC110:
+	.long	1061962282
+	.align 8
+.LC112:
 	.long	-17155601
 	.long	1082535490
 	.align 8
-.LC106:
+.LC114:
 	.long	-718458799
 	.long	-1064875760
 	.align 8
-.LC108:
+.LC116:
 	.long	1697350398
 	.long	1073157447
 	.align 8
-.LC110:
+.LC118:
 	.long	0
 	.long	1072049728
 	.align 8
-.LC112:
+.LC120:
 	.long	-814109750
 	.long	1052243921
 	.align 8
-.LC114:
+.LC122:
 	.long	-706458648
 	.long	1059097037
 	.align 8
-.LC116:
+.LC124:
 	.long	214576254
 	.long	1067386577
 	.align 8
-.LC118:
+.LC126:
 	.long	0
 	.long	1072693248
 	.align 8
-.LC120:
+.LC128:
 	.long	-1137287264
 	.long	1053372086
 	.align 8
-.LC122:
+.LC130:
 	.long	-1257720128
 	.long	1063562809
 	.align 8
-.LC124:
+.LC132:
 	.long	-1735925644
 	.long	1070405385
 	.align 8
-.LC126:
+.LC134:
 	.long	0
 	.long	1073741824
 	.align 8
-.LC129:
+.LC137:
 	.long	0
 	.long	2146435072
 	.align 8
-.LC131:
+.LC139:
 	.long	0
 	.long	2146959360
 	.align 8
-.LC132:
-	.quad	1023
-	.align 8
-.LC134:
-	.long	0
-	.long	1048576
-	.align 8
-.LC136:
-	.long	0
-	.long	1129316352
-	.align 8
-.LC139:
-	.long	-1
-	.long	1048575
-	.align 32
 .LC140:
-	.quad	4602678819172646912
-	.quad	4602678819172646912
-	.quad	4602678819172646912
-	.quad	4602678819172646912
+	.quad	1023
 	.align 8
 .LC142:
 	.long	0
-	.long	1078657024
+	.long	1048576
 	.align 8
 .LC144:
+	.long	0
+	.long	1129316352
+	.align 8
+.LC147:
+	.long	-1
+	.long	1048575
+	.align 32
+.LC148:
+	.quad	4602678819172646912
+	.quad	4602678819172646912
+	.quad	4602678819172646912
+	.quad	4602678819172646912
+	.align 8
+.LC150:
+	.long	0
+	.long	1078657024
+	.align 8
+.LC152:
 	.long	1719614413
 	.long	1072079006
 	.align 8
-.LC146:
+.LC154:
 	.long	0
 	.long	-1074790400
 	.align 8
-.LC148:
+.LC156:
 	.long	0
 	.long	-1064308736
 	.align 8
-.LC150:
+.LC158:
 	.long	-1815929936
 	.long	1058714818
 	.align 8
-.LC152:
+.LC160:
 	.long	1062621938
 	.long	1071634165
 	.align 8
-.LC154:
+.LC162:
 	.long	-309171951
 	.long	1074975418
 	.align 8
-.LC156:
+.LC164:
 	.long	-968955090
 	.long	1076690802
 	.align 8
-.LC158:
+.LC166:
 	.long	-1840527283
 	.long	1077014486
 	.align 8
-.LC160:
+.LC168:
 	.long	2105466104
 	.long	1075762531
 	.align 8
-.LC162:
+.LC170:
 	.long	-1365774450
 	.long	1076269856
 	.align 8
-.LC164:
+.LC172:
 	.long	1310310451
 	.long	1078369580
 	.align 8
-.LC166:
+.LC174:
 	.long	-1557742147
 	.long	1079295795
 	.align 8
-.LC168:
+.LC176:
 	.long	-346116575
 	.long	1079101922
 	.align 8
-.LC170:
+.LC178:
 	.long	-1642125902
 	.long	1077354506
 	.align 8
-.LC172:
+.LC180:
 	.long	1549864104
 	.long	-1087647728
-	.set	.LC174,.LC140
+	.set	.LC182,.LC148
 	.align 8
-.LC176:
+.LC184:
 	.long	0
 	.long	1072050176
 	.align 8
-.LC178:
+.LC186:
 	.long	0
 	.long	-1048576
 	.align 8
-.LC179:
+.LC187:
 	.quad	2047
 	.ident	"GCC: (Rev8, Built by MSYS2 project) 15.2.0"

@@ -39,6 +39,11 @@ AVX2M_DEFINE_F32_UNARY(avx2_log10_f32,  avx2_log10_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_log1p_f32,  avx2_log1p_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_tanh_f32,   avx2_tanh_ps)
 AVX2M_DEFINE_F32_UNARY(avx2_sigmoid_f32,avx2_sigmoid_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_rsqrt_f32,  avx2_rsqrt_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_sqrt_f32,   avx2_sqrt_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_cbrt_f32,   avx2_cbrt_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_softplus_f32,avx2_softplus_ps)
+AVX2M_DEFINE_F32_UNARY(avx2_gelu_f32,   avx2_gelu_ps)
 
 /* ---- single precision, two inputs: out[i] = pow(base[i], exp_[i]) ------- */
 void avx2_pow_f32(const float *base, const float *exp_, float *out, size_t n)

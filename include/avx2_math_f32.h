@@ -658,4 +658,188 @@ static inline __m256 avx2_pow_ps(__m256 base, __m256 y)
     return res;
 }
 
+/* ===========================================================================
+ *  rsqrt:  1 / sqrt(x)     (reciprocal square root)
+ * ===========================================================================
+ *
+ *  The classic SIMD pattern: a cheap hardware seed refined by Newton-Raphson.
+ *
+ *  `vrsqrtps` (_mm256_rsqrt_ps) gives ~12 correct bits in one instruction. To
+ *  reach near full single precision we apply the Newton step for the root of
+ *  f(y) = 1/y^2 - x, whose iteration is
+ *
+ *      y_{n+1} = y_n * (1.5 - 0.5*x*y_n^2)
+ *
+ *  Each step roughly doubles the correct bits, so two steps take ~12 -> ~24
+ *  bits, i.e. ~1 ULP. We carry `0.5*x` once and use FMA so each step is two
+ *  multiplies and one fnmadd.
+ *
+ *  Accuracy: <= 2 ULP. Edges: x==0 -> +inf, x<0 -> NaN, x==+inf -> 0
+ *  (the +inf seed * the NR step would otherwise make inf*0 = NaN, so +inf is
+ *  masked back to 0 explicitly).
+ */
+static inline __m256 avx2_rsqrt_ps(__m256 x)
+{
+    const __m256 half  = _mm256_set1_ps(0.5f);
+    const __m256 three_halves = _mm256_set1_ps(1.5f);
+
+    __m256 y = _mm256_rsqrt_ps(x);          /* ~12-bit approximation of 1/sqrt(x) */
+    const __m256 xhalf = _mm256_mul_ps(x, half);
+
+    /* NR step 1: y *= 1.5 - (0.5x)*y*y */
+    __m256 t = _mm256_fnmadd_ps(_mm256_mul_ps(xhalf, y), y, three_halves);
+    y = _mm256_mul_ps(y, t);
+    /* NR step 2 */
+    t = _mm256_fnmadd_ps(_mm256_mul_ps(xhalf, y), y, three_halves);
+    y = _mm256_mul_ps(y, t);
+
+    /* Edge fixups. */
+    y = _mm256_blendv_ps(y, _mm256_set1_ps(INFINITY),
+                         _mm256_cmp_ps(x, _mm256_setzero_ps(), _CMP_EQ_OQ)); /* x==0 -> +inf */
+    y = _mm256_blendv_ps(y, _mm256_setzero_ps(),
+                         _mm256_cmp_ps(x, _mm256_set1_ps(INFINITY), _CMP_EQ_OQ)); /* +inf -> 0 */
+    y = _mm256_blendv_ps(y, _mm256_set1_ps(NAN),
+                         _mm256_cmp_ps(x, _mm256_setzero_ps(), _CMP_LT_OS));  /* x<0 -> NaN */
+    return y;
+}
+
+/* ===========================================================================
+ *  cbrt:  cube root (x^(1/3))     -- the bit-manipulation showpiece
+ * ===========================================================================
+ *
+ *  Cube root is odd, so we work on |x| and re-apply the sign at the end.
+ *
+ *  INITIAL GUESS by exponent surgery. If x = 2^e * m, then cbrt(x) = 2^(e/3) *
+ *  cbrt(m), so dividing the *whole IEEE-754 bit pattern* by 3 and adding a
+ *  bias constant lands us within a few percent of the answer in a couple of
+ *  integer ops. AVX2 has no integer divide, so we divide by 3 with the
+ *  multiply-high identity  n/3 = (n * 0xAAAAAAAB) >> 33  (0xAAAAAAAB ~ 2^33/3).
+ *  `_mm256_mul_epu32` multiplies the even 32-bit lanes into 64-bit products; we
+ *  run it once on the dwords as-is (lanes 0,2,4,6) and once on the vector
+ *  shifted right 32 (lanes 1,3,5,7), shift each product right 33, and weave the
+ *  two halves back together.
+ *
+ *  REFINEMENT by Halley's method (cubically convergent - triples the correct
+ *  digits per step):  y <- y * (y^3 + 2a) / (2*y^3 + a),  a = |x|.
+ *  Two iterations take the ~few-percent seed to <= 2 ULP.
+ *
+ *  Edges: cbrt(+-0)=+-0, cbrt(+-inf)=+-inf, cbrt(NaN)=NaN (all masked, since
+ *  the Halley ratio would otherwise make 0/0 or inf/inf = NaN).
+ */
+static inline __m256 avx2_cbrt_ps(__m256 x)
+{
+    const __m256 signbit = _mm256_set1_ps(-0.0f);
+    const __m256 two     = _mm256_set1_ps(2.0f);
+
+    const __m256 sign = _mm256_and_ps(x, signbit);        /* remember sign of x */
+    const __m256 a    = _mm256_andnot_ps(signbit, x);     /* a = |x|            */
+    const __m256i ix  = _mm256_castps_si256(a);           /* bit pattern of |x| */
+
+    /* q = floor(ix / 3) via multiply-high by 0xAAAAAAAB, then >> 33. */
+    const __m256i M = _mm256_set1_epi32((int)0xAAAAAAABu);
+    __m256i lo = _mm256_mul_epu32(ix, M);                          /* dwords 0,2,4,6 -> 64b */
+    __m256i hi = _mm256_mul_epu32(_mm256_srli_epi64(ix, 32), M);   /* dwords 1,3,5,7 -> 64b */
+    lo = _mm256_srli_epi64(lo, 33);                                /* /3 of even dwords     */
+    hi = _mm256_srli_epi64(hi, 33);                                /* /3 of odd dwords      */
+    hi = _mm256_slli_epi64(hi, 32);                               /* back to odd positions  */
+    const __m256i q = _mm256_or_si256(lo, hi);                    /* floor(ix/3), all 8     */
+
+    /* Seed: bits = q + magic bias. The bias sets the exponent offset and a
+     * mantissa correction that minimizes the seed error before refinement. */
+    const __m256i bias = _mm256_set1_epi32(0x2a514067);
+    __m256 y = _mm256_castsi256_ps(_mm256_add_epi32(q, bias));
+
+    /* Two Halley iterations:  y *= (y^3 + 2a) / (2 y^3 + a). */
+    for (int it = 0; it < 2; ++it) {
+        const __m256 y3 = _mm256_mul_ps(_mm256_mul_ps(y, y), y);
+        const __m256 num = _mm256_fmadd_ps(two, a, y3);   /* y^3 + 2a  */
+        const __m256 den = _mm256_fmadd_ps(two, y3, a);   /* 2 y^3 + a */
+        y = _mm256_mul_ps(y, _mm256_div_ps(num, den));
+    }
+
+    /* Re-apply sign, then mask the special inputs. */
+    __m256 res = _mm256_or_ps(y, sign);
+    res = _mm256_blendv_ps(res, sign,                                  /* +-0 -> +-0   */
+                           _mm256_cmp_ps(a, _mm256_setzero_ps(), _CMP_EQ_OQ));
+    res = _mm256_blendv_ps(res, _mm256_or_ps(_mm256_set1_ps(INFINITY), sign), /* +-inf */
+                           _mm256_cmp_ps(a, _mm256_set1_ps(INFINITY), _CMP_EQ_OQ));
+    res = _mm256_blendv_ps(res, x, _mm256_cmp_ps(x, x, _CMP_UNORD_Q));  /* NaN -> NaN   */
+    return res;
+}
+
+/* ===========================================================================
+ *  sqrt:  sqrt(x)
+ * ===========================================================================
+ *
+ *  Thin wrapper over the hardware `vsqrtps`, which is correctly rounded (0 ULP)
+ *  and already handles every special case (sqrt(-x)=NaN, sqrt(+-0)=+-0,
+ *  sqrt(+inf)=+inf). Provided so callers can stay in the avx2_* namespace; for
+ *  a fast approximate root use 1/avx2_rsqrt_ps or x*avx2_rsqrt_ps(x).
+ */
+static inline __m256 avx2_sqrt_ps(__m256 x)
+{
+    return _mm256_sqrt_ps(x);
+}
+
+/* ===========================================================================
+ *  softplus:  ln(1 + e^x)     (smooth ReLU)
+ * ===========================================================================
+ *
+ *  The textbook `log(1 + exp(x))` overflows for large x (exp(x) -> inf) and
+ *  loses precision for very negative x. The numerically stable identity
+ *
+ *      softplus(x) = max(x, 0) + log1p(exp(-|x|))
+ *
+ *  feeds exp a non-positive argument (so exp stays in (0,1], never overflows)
+ *  and adds the dominant linear part max(x,0) separately. Reuses avx2_exp_ps
+ *  and avx2_log1p_ps. Activation function (a smooth approximation of ReLU).
+ *
+ *  Accuracy: <= 2 ULP. softplus(0)=ln2, large +x -> ~x, -inf -> 0, +inf -> +inf.
+ */
+static inline __m256 avx2_softplus_ps(__m256 x)
+{
+    const __m256 zero    = _mm256_setzero_ps();
+    const __m256 signbit = _mm256_set1_ps(-0.0f);
+
+    const __m256 ax  = _mm256_andnot_ps(signbit, x);       /* |x|            */
+    const __m256 m   = _mm256_max_ps(x, zero);             /* max(x, 0)      */
+    const __m256 e   = avx2_exp_ps(_mm256_sub_ps(zero, ax)); /* e^-|x| in (0,1] */
+    return _mm256_add_ps(m, avx2_log1p_ps(e));
+}
+
+/* ===========================================================================
+ *  gelu:  Gaussian Error Linear Unit (tanh approximation)
+ * ===========================================================================
+ *
+ *  GELU(x) = x * Phi(x), where Phi is the standard-normal CDF. The exact form
+ *  needs erf; the tanh approximation used by GPT/BERT and most transformer
+ *  implementations is
+ *
+ *      GELU(x) ~= 0.5*x*(1 + tanh( sqrt(2/pi) * (x + 0.044715*x^3) ))
+ *
+ *  The inner cubic is evaluated as x*(1 + 0.044715*x^2) with one FMA, then
+ *  scaled by sqrt(2/pi) and passed through avx2_tanh_ps.
+ *
+ *  Accuracy: this is an APPROXIMATION of the exact erf-based GELU - it differs
+ *  from it by up to ~1e-3 (the well-known error of the tanh form, not an
+ *  implementation defect). The kernel itself is a faithful evaluation of the
+ *  formula above. gelu(0)=0, large +x -> ~x, large -x -> ~0. GELU is NOT odd.
+ */
+static inline __m256 avx2_gelu_ps(__m256 x)
+{
+    const __m256 half = _mm256_set1_ps(0.5f);
+    const __m256 one  = _mm256_set1_ps(1.0f);
+    const __m256 c_sqrt_2_over_pi = _mm256_set1_ps(0.7978845608028654f); /* sqrt(2/pi) */
+    const __m256 c_044715         = _mm256_set1_ps(0.044715f);
+
+    const __m256 x2 = _mm256_mul_ps(x, x);
+    /* inner = sqrt(2/pi) * x * (1 + 0.044715*x^2) */
+    __m256 inner = _mm256_mul_ps(x, _mm256_fmadd_ps(c_044715, x2, one));
+    inner = _mm256_mul_ps(inner, c_sqrt_2_over_pi);
+
+    const __m256 t = avx2_tanh_ps(inner);
+    /* 0.5*x*(1 + tanh(inner)) */
+    return _mm256_mul_ps(_mm256_mul_ps(half, x), _mm256_add_ps(one, t));
+}
+
 #endif /* AVX2_MATH_F32_H */

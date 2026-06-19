@@ -56,6 +56,19 @@ int main(void)
     show_f32("exp",      _mm256_loadu_ps(ex));
     show_f32("pow",      avx2_pow_ps(_mm256_loadu_ps(base), _mm256_loadu_ps(ex)));
 
+    /* roots and more activations */
+    const float rs[8] = { 0.25f, 1.0f, 2.0f, 4.0f, 8.0f, 16.0f, 27.0f, 100.0f };
+    __m256 rv = _mm256_loadu_ps(rs);
+    printf("\n");
+    show_f32("v",        rv);
+    show_f32("sqrt",     avx2_sqrt_ps(rv));
+    show_f32("rsqrt",    avx2_rsqrt_ps(rv));
+    show_f32("cbrt",     avx2_cbrt_ps(rv));
+    printf("\n");
+    show_f32("x",        x);
+    show_f32("softplus", avx2_softplus_ps(x));
+    show_f32("gelu",     avx2_gelu_ps(x));
+
     /* round-trip sanity: log(exp(x)) should recover x */
     printf("\n");
     show_f32("log(exp)", avx2_log_ps(avx2_exp_ps(x)));

@@ -143,6 +143,11 @@ void avx2_log10_f32 (const float *in, float *out, size_t n);
 void avx2_log1p_f32 (const float *in, float *out, size_t n);
 void avx2_tanh_f32  (const float *in, float *out, size_t n);
 void avx2_sigmoid_f32(const float *in, float *out, size_t n);
+void avx2_rsqrt_f32 (const float *in, float *out, size_t n);
+void avx2_sqrt_f32  (const float *in, float *out, size_t n);
+void avx2_cbrt_f32  (const float *in, float *out, size_t n);
+void avx2_softplus_f32(const float *in, float *out, size_t n);
+void avx2_gelu_f32  (const float *in, float *out, size_t n);
 
 /* single precision, two inputs: out[i] = pow(base[i], exp_[i]) */
 void avx2_pow_f32   (const float *base, const float *exp_, float *out, size_t n);
